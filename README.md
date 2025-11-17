@@ -75,6 +75,6 @@ Sporticket adalah platform penjualan tiket digital pertandingan olahraga yang di
 
 **Tautan APK** = [MENYUSUL]
 
-**CREDENTIALS ADMIN (SUPERUSER)**
-Username (email): admin@sporticket.com
+**CREDENTIALS ADMIN (SUPERUSER)**  
+Username (email): admin@sporticket.com  
 Password: adminsporticket2025
