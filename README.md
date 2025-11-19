@@ -67,14 +67,60 @@ Sporticket adalah platform penjualan tiket digital pertandingan olahraga yang di
     Pembeli dapat melihat detail tiket dan riwayat pembelian, membeli tiket pertandingan, ganti/update jumlah tiket yang dibeli, membatalkan pembelian tiket, membuat review event, mengedit review event yang ia buat, dan menghapus review event yang ia buat.
 
 **Alur pengintegrasian data di aplikasi dengan aplikasi web (PWS)**  
-...
+**Django sebagai back-end API:**  
+Django bertindak sebagai penyedia layanan web (web service) yang mengirimkan dan menerima data dalam format JSON  
+Proses pengembangan pada sisi Django meliputi:  
+**1. Perancangan Model**  
+- Mendefinisikan struktur data yang akan digunakan dan disimpan dalam database, seperti model untuk pengguna, pembeli, serta lainnya. 
+
+**2. Pembuatan Serializer**  
+- Mengubah data model menjadi format JSON agar dapat dikirim ke client (Flutter).  
+- Menerima data JSON dari Flutter kemudian memvalidasinya sebelum disimpan ke database.  
+
+**3. Pembuatan View atau ViewSet**  
+- Mengatur logika proses CRUD (Create, Read, Update, Delete).  
+- Menentukan bagaimana data diambil, diproses, atau disimpan melalui API.  
+
+**4. Routing atau URL Configuration**  
+- Mendefinisikan endpoint API, misalnya:
+ `/api/products/`, `/api/auth/login/`, dan sebagainya. 
+
+**5. Konfigurasi Autentikasi**  
+- Menggunakan cookie/session, Django akan mengelola session berbasis cookie agar Flutter tetap memiliki status login.
+
+**6. Konfigurasi CORS**  
+- Agar Flutter dapat mengakses API, Django perlu mengizinkan origin tertentu melalui konfigurasi CORS.
+
+**Endpoint API dari Django:**  
+Setelah backend selesai dibangun, Django menyediakan endpoint-endpoint yang dapat diakses oleh aplikasi Flutter. Endpoint ini nantinya akan digunakan untuk:  
+- Mengambil data (GET)
+- Mengirim data baru (POST)
+- Memperbarui data (PUT/PATCH)
+- Menghapus data (DELETE)
+
+Contoh implementasi: https://server.com/api/products/
+
+**Flutter sebagai front-end API:**  
+Flutter berfungsi sebagai aplikasi client yang mengakses API Django. Flutter melakukan komunikasi melalui HTTP request dan menerima respons berupa JSON.  
+**Tahapan di sisi Flutter:**  
+**1. Mengirim request ke Django**
+- Menggunakan library seperti http, dio, atau pbp_django_auth
+
+**2. Menerima respons JSON**
+- Data yang diterima diparsing menjadi model Dart.
+
+**3. Pengolahan data**
+- Data di-store dalam state management (misalnya Provider, Bloc, Riverpod).
+
+**4. Menampilkan data pada UI**
+- Data yang sudah diproses ditampilkan ke dalam komponen UI Flutter. 
+
+**5. Penanganan error**
+- Flutter akan menangani error seperti input tidak valid, koneksi gagal, dll
+
 
 **Tautan PWS** = https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/
 
-**Tautan design** = https://www.figma.com/design/rYfw6PmdiLXbLFPPriPFEe/Design-Web-Sporticket?node-id=0-1&t=lOHvODza4QLRYjHE-1
+**Tautan design** = https://www.figma.com/design/HXRRzkW7WdbLWYq2gYPcRV/PAS-PBP-A02?node-id=0-1&p=f&t=hoqW4dAuSgROBtpq-0
 
 **Tautan APK** = [MENYUSUL]
-
-**CREDENTIALS ADMIN (SUPERUSER)**  
-Username (email): admin@sporticket.com  
-Password: adminsporticket2025
