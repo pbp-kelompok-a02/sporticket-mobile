@@ -11,6 +11,9 @@ Nama Aplikasi   : SPORTICKET
 **PEMBAGIAN MODUL**  
 Account (michelle) → Event (aqeel) → Ticket (fidan) → Order (ali) → Review (luna)
 
+**Tautan Sheets PAS Planning**  
+https://docs.google.com/spreadsheets/d/1NmntSv9dasmsV7V2li1rIm7cTCm7ffiQdOlci4FY0AE/edit?usp=sharing
+
 **Deskripsi Aplikasi**  
 Sporticket adalah platform penjualan tiket digital pertandingan olahraga yang dirancang untuk memberikan kemudahan kepada penggemar olahraga sepak bola, basket, voli, badminton, dan tenis dalam membeli tiket untuk event-event olahraga favorit mereka. Aplikasi ini menawarkan pengalaman pengguna yang cepat, aman, dan efisien dalam membeli tiket untuk berbagai event olahraga, dengan integrasi pemilihan kategori tiket (reguler atau VIP), sistem notifikasi, dan akses mudah ke riwayat pembelian. Fitur-fitur lengkap aplikasi Sporticket dijelaskan lebih lanjut dalam bagian daftar modul.
 
