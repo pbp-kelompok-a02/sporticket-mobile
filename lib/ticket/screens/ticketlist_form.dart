@@ -263,11 +263,7 @@ class _TicketFormPageState extends State<TicketFormPage> {
                                               .showSnackBar(const SnackBar(
                                             content: Text("Ticket successfully saved!"),
                                           ));
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => TicketEntryListPage(matchId: widget.matchId)),
-                                          );
+                                          Navigator.pop(context, true);
                                         } else {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(const SnackBar(

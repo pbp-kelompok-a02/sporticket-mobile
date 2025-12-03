@@ -37,19 +37,21 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
     final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ticket Entry List'),
+        title: const Text('Ticket List'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final updated = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => TicketFormPage(
-                    matchId: widget.matchId,   // ← PENTING! Kirim matchId
-                  ),
+                  builder: (_) => TicketFormPage(matchId: widget.matchId),
                 ),
               );
+
+              if (updated == true) {
+                setState(() {}); // REFRESH LIST
+              }
             },
           )
         ],

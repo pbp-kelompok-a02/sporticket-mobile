@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sporticket_mobile/ticket/screens/login.dart';
-import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
+// import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
 import 'package:sporticket_mobile/ticket/prototype/event_entry_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+// TODO: import halaman list event kalo udh ada
+import 'package:sporticket_mobile/screens/login_page.dart'; // nanti dihapus kalo udh ada halaman list event
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +15,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Provider(
@@ -24,31 +26,15 @@ class MyApp extends StatelessWidget {
         title: 'Sporticket',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // TRY THIS: Try running your application with "flutter run". You'll see
-          // the application has a purple toolbar. Then, without quitting the app,
-          // try changing the seedColor in the colorScheme below to Colors.green
-          // and then invoke "hot reload" (save your changes or press the "hot
-          // reload" button in a Flutter-supported IDE, or press "r" if you used
-          // the command line to start the app).
-          //
-          // Notice that the counter didn't reset back to zero; the application
-          // state is not lost during the reload. To reset the state, use hot
-          // restart instead.
-          //
-          // This works for code too, not just values: Most code changes can be
-          // tested with just a hot reload.
-            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-          .copyWith(secondary: Colors.blueAccent[400]),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF537FB9),
+            primary: const Color(0xFF537FB9),
+          ),
+          useMaterial3: true,
         ),
-        // home: TicketFormPage(
-        //   category: 'VIP',
-        //   price: 10.0,
-        //   stock: 1000,
-        // )
-        home: LoginPage(),
-      )
+        // TODO: ganti LoginPage dengan halaman list event kalo udh ada
+        home: const EventEntryListPage(),
+      ),
     );
   }
 }
