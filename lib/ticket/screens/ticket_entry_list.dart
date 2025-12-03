@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sporticket_mobile/ticket/models/ticket_entry.dart';
 import 'package:sporticket_mobile/ticket/widgets/ticket_entry_card.dart';
+import 'package:sporticket_mobile/ticket/screens/ticketlist_form.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class TicketEntryListPage extends StatefulWidget {
-  const TicketEntryListPage({super.key});
+  final String matchId;
+
+  const TicketEntryListPage({super.key, required this.matchId});
 
   @override
   State<TicketEntryListPage> createState() => _TicketEntryListPageState();
@@ -14,7 +17,7 @@ class TicketEntryListPage extends StatefulWidget {
 class _TicketEntryListPageState extends State<TicketEntryListPage> {
   Future<List<TicketEntry>> fetchTicket(CookieRequest request) async {
     
-    final response = await request.get('http://localhost:8000/json/');
+    final response = await request.get('http://localhost:8000/ticket/json/${widget.matchId}/');
     
     // Decode response to json format
     var data = response;
@@ -35,6 +38,21 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ticket Entry List'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TicketFormPage(
+                    matchId: widget.matchId,   // ← PENTING! Kirim matchId
+                  ),
+                ),
+              );
+            },
+          )
+        ],
       ),
       body: FutureBuilder(
         future: fetchTicket(request),
@@ -42,11 +60,11 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
           if (snapshot.data == null) {
             return const Center(child: CircularProgressIndicator());
           } else {
-            if (!snapshot.hasData) {
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Column(
                 children: [
                   Text(
-                    'There are no ticket in football ticket yet.',
+                    'There are no tickets yet.',
                     style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
                   ),
                   SizedBox(height: 8),
@@ -63,7 +81,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
                       ..hideCurrentSnackBar()
                       ..showSnackBar(
                         SnackBar(
-                          content: Text("You clicked on ${snapshot.data![index].title}"),
+                          content: Text("You clicked on ${snapshot.data![index].category}"),
                         ),
                       );
                   },

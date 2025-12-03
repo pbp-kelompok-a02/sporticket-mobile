@@ -3,18 +3,13 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
-// import 'package:sporticket_mobile/ticket/screens/'
 
 class TicketFormPage extends StatefulWidget {
-    final String category;
-    final double price;
-    final int stock;
+    final String matchId;
 
     const TicketFormPage({
       super.key,
-      required this.category,
-      required this.price,
-      required this.stock
+      required this.matchId,
     });
 
     @override
@@ -254,8 +249,9 @@ class _TicketFormPageState extends State<TicketFormPage> {
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                       final response = await request.postJson(
-                                        "http://localhost:8000/create-flutter/",
+                                        "http://localhost:8000/ticket/create-flutter/",
                                         jsonEncode({
+                                          "event_id": widget.matchId,
                                           "category": _category,
                                           "price": _price,
                                           "stock": _stock
@@ -270,7 +266,7 @@ class _TicketFormPageState extends State<TicketFormPage> {
                                           Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => TicketEntryListPage()),
+                                                builder: (context) => TicketEntryListPage(matchId: widget.matchId)),
                                           );
                                         } else {
                                           ScaffoldMessenger.of(context)
