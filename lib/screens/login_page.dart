@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:sporticket_mobile/screens/register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,13 +22,11 @@ class _LoginPageState extends State<LoginPage> {
     final Color primaryBlue = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
-      // ini agar body memanjang ke belakang AppBar agar background full screen
       extendBodyBehindAppBar: true,
-      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leadingWidth: 100, // agar ada space untuk tombol "Back"
+        leadingWidth: 100,
         leading: InkWell(
           onTap: () => Navigator.pop(context),
           borderRadius: BorderRadius.circular(20),
@@ -83,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20.0),
                       child: Column(
-                        children: [                          
+                        children: [                                  
                           // promosi registrasi
                           Container(
                             width: double.infinity,
@@ -112,8 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                                 const SizedBox(height: 20),
                                 ElevatedButton(
                                   onPressed: () {
-                                    // TODO: mengarah ke halaman Register
-                                    // Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterPage()));
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white,
@@ -209,9 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ],
                                 ),
                                 
-                                const SizedBox(height: 12),
-
-                                // checkbox remember me
+                                const SizedBox(height: 12),                           
                                 Row(
                                   children: [
                                     SizedBox(
@@ -232,9 +228,12 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    const Text(
-                                      "Remember me",
-                                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                                    const Expanded(
+                                      child: Text(
+                                        "Remember me",
+                                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -259,31 +258,44 @@ class _LoginPageState extends State<LoginPage> {
                                       onPressed: () async {
                                         setState(() => _isLoading = true);
                                         
-                                        // TODO: ganti jadi link pws
-                                        final response = await request.login(
-                                          "http://10.0.2.2:8000/account/login-mobile/", 
-                                          {
-                                            'username': _emailController.text,
-                                            'password': _passwordController.text,
-                                            'remember_me': _rememberMe,
-                                          },
-                                        );
+                                        try {
+                                          // TODO: ganti jd link pws
+                                          final response = await request.login(
+                                            "http://127.0.0.1:8000/account/login-mobile/", 
+                                            {
+                                              'username': _emailController.text,
+                                              'password': _passwordController.text,
+                                              'remember_me': _rememberMe.toString(),
+                                            },
+                                          );
 
-                                        setState(() => _isLoading = false);
-
-                                        if (request.loggedIn) {
                                           if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                              content: Text("Welcome ${response['username']}!"),
-                                              backgroundColor: Colors.green,
-                                              behavior: SnackBarBehavior.floating,
-                                            ));
-                                            Navigator.pop(context);
+                                            setState(() => _isLoading = false);
+
+                                            if (request.loggedIn) {
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                content: Text("Welcome ${response['username']}!"),
+                                                backgroundColor: Colors.green,
+                                                behavior: SnackBarBehavior.floating,
+                                              ));
+                                              
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(builder: (context) => const LoginPage()), // Ganti ke halaman Home jika sudah ada
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                content: Text(response['message'] ?? "Login failed"),
+                                                backgroundColor: Colors.red,
+                                                behavior: SnackBarBehavior.floating,
+                                              ));
+                                            }
                                           }
-                                        } else {
+                                        } catch (e) {
                                           if (context.mounted) {
+                                            setState(() => _isLoading = false);
                                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                              content: Text(response['message'] ?? "Login failed"),
+                                              content: Text("Error: $e"),
                                               backgroundColor: Colors.red,
                                               behavior: SnackBarBehavior.floating,
                                             ));
