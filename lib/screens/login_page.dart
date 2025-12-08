@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:sporticket_mobile/screens/profile_page.dart';
 import 'package:sporticket_mobile/screens/register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,31 +21,37 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     final Color primaryBlue = Theme.of(context).colorScheme.primary;
+    
+    // cek apakah bisa back
+    final bool canPop = Navigator.canPop(context);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leadingWidth: 100,
-        leading: InkWell(
-          onTap: () => Navigator.pop(context),
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            margin: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 8), 
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.arrow_back_ios, color: primaryBlue, size: 20), 
-                Text(
-                  "Back", 
-                  style: TextStyle(color: primaryBlue, fontWeight: FontWeight.w500, fontSize: 16),
+        leadingWidth: canPop ? 100 : 0,
+        automaticallyImplyLeading: false, // nonaktifkan back saat login page adalah root
+        leading: canPop 
+          ? InkWell(
+              onTap: () => Navigator.pop(context),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                margin: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8), 
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.arrow_back_ios, color: primaryBlue, size: 20), 
+                    Text(
+                      "Back", 
+                      style: TextStyle(color: primaryBlue, fontWeight: FontWeight.w500, fontSize: 16),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ),
+              ),
+            )
+          : null, // sembunyikan kalo gak bisa back
       ),
       
       body: Stack(
@@ -259,7 +266,7 @@ class _LoginPageState extends State<LoginPage> {
                                         setState(() => _isLoading = true);
                                         
                                         try {
-                                          // TODO: ganti jd link pws
+                                          // TODO: ganti ke link pws
                                           final response = await request.login(
                                             "http://127.0.0.1:8000/account/login-mobile/", 
                                             {
@@ -281,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
                                               
                                               Navigator.pushReplacement(
                                                 context,
-                                                MaterialPageRoute(builder: (context) => const LoginPage()), // Ganti ke halaman Home jika sudah ada
+                                                MaterialPageRoute(builder: (context) => const ProfilePage()), // TODO: ganti ke halaman Home jika sudah ada
                                               );
                                             } else {
                                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
