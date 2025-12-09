@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Import Image Picker
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
@@ -20,6 +22,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   final Color profileHeaderColor = const Color(0xFF537fb9);
 
+  // variabel buat simpan gambar baru yg dipilih saat edit
+  String? _newImageBase64;
+  String? _newImageName;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
@@ -33,26 +40,25 @@ class _ProfilePageState extends State<ProfilePage> {
       // TODO: ganti jd link pws
       String url = 'http://127.0.0.1:8000/account/profile-mobile/';
 
-      // kalo ada userid yg dipassing, ganti url jd endpoint detail profil org lain
       if (widget.userId != null) {
         url = 'http://127.0.0.1:8000/account/profile-mobile/${widget.userId}/';
       }
 
       final response = await request.get(url);
-      if (mounted) {
-        setState(() {
-          if (response['status'] == true) {
-            userProfile = Profile.fromJson(response['data']);
-          }
-          isLoading = false;
-        });
-      }
+
+      if (!mounted) return;
+
+      setState(() {
+        if (response['status'] == true) {
+          userProfile = Profile.fromJson(response['data']);
+        }
+        isLoading = false;
+      });
     } catch (e) {
       if (mounted) setState(() => isLoading = false);
     }
   }
 
-  // logic buat logout, panggil endpoint logout di django
   Future<void> handleLogout() async {
     final request = context.read<CookieRequest>();
     try {
@@ -60,6 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final response = await request.logout(
         "http://127.0.0.1:8000/account/logout-mobile/",
       );
+      
       if (!mounted) return;
 
       if (response['status'] == true) {
@@ -69,7 +76,6 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: Colors.green,
           ),
         );
-        // redirect ke halaman event list & apus history navigasi biar ga bs back
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const EventListPage()),
@@ -92,74 +98,174 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // munculin popup buat edit profil (nama & no hp)
+  // fungsi helper buat pilih gambar baru
+  Future<void> _pickNewImage(StateSetter setStateModal) async {
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      final String base64Image = base64Encode(bytes);
+
+      String mimeType = "image/jpeg";
+      if (pickedFile.path.endsWith(".png")) {
+        mimeType = "image/png";
+      }
+
+      final String formattedBase64 = "data:$mimeType;base64,$base64Image";
+
+      // pake setStateModal biar UI di dalem dialog ke-update
+      setStateModal(() {
+        _newImageBase64 = formattedBase64;
+        _newImageName = pickedFile.name;
+      });
+    }
+  }
+
+  // munculin popup buat edit profil (nama, no hp, & FOTO)
   void showEditDialog() {
     String name = userProfile?.name ?? "";
     String phone = userProfile?.phoneNumber ?? "";
 
+    // reset gambar baru setiap kali dialog dibuka
+    _newImageBase64 = null;
+    _newImageName = null;
+
     showDialog(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text("Edit Profile"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: const InputDecoration(labelText: "Full Name"),
-              onChanged: (val) => name = val,
-              controller: TextEditingController(text: name),
-            ),
-            TextField(
-              decoration: const InputDecoration(labelText: "Phone Number"),
-              onChanged: (val) => phone = val,
-              controller: TextEditingController(text: phone),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final request = context.read<CookieRequest>();
-              try {
-                // TODO: ganti jd link pws
-                final response = await request.post(
-                  'http://127.0.0.1:8000/account/edit-profile-mobile/',
-                  {'name': name, 'phone_number': phone},
-                );
+      builder: (BuildContext dialogContext) {
+        // pake StatefulBuilder biar bisa setState di dalam dialog sehingga bisa update preview gambar
+        return StatefulBuilder(
+          builder: (context, setStateModal) {
+            return AlertDialog(
+              title: const Text("Edit Profile"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // bagian buat nampilin foto profil & ganti foto
+                    GestureDetector(
+                      onTap: () => _pickNewImage(setStateModal),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.grey.shade300),
+                              color: Colors.grey[100],
+                            ),
+                            child: ClipOval(
+                              // logika nampilin gambar : kalo ada gambar baru, pake itu. kalo gaada, pake gambar lama. kalo gaada gambar lama, pake placeholder
+                              child: _newImageBase64 != null
+                                  ? Image.memory(
+                                      base64Decode(
+                                        _newImageBase64!.split(',').last,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : (userProfile?.profilePhoto != null
+                                        // TODO: ganti jd link pws
+                                        ? Image.network(
+                                            "http://127.0.0.1:8000${userProfile!.profilePhoto!}",
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.asset(
+                                            'assets/images/no-profile-picture.png',
+                                            fit: BoxFit.cover,
+                                          )),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _newImageName ?? "Tap to change photo",
+                            style: TextStyle(
+                              color: profileHeaderColor,
+                              fontSize: 12,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      decoration: const InputDecoration(labelText: "Full Name"),
+                      onChanged: (val) => name = val,
+                      controller: TextEditingController(text: name),
+                    ),
+                    TextField(
+                      decoration: const InputDecoration(
+                        labelText: "Phone Number",
+                      ),
+                      onChanged: (val) => phone = val,
+                      controller: TextEditingController(text: phone),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final request = context.read<CookieRequest>();
+                    try {
+                      // siapin data yg mau dikirim
+                      Map<String, dynamic> dataToSend = {
+                        'name': name,
+                        'phone_number': phone,
+                      };
 
-                if (mounted) {
-                  Navigator.pop(context);
-                  if (response['status'] == true) {
-                    fetchProfile(); // refresh data di layar
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Profile Updated!")),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(response['message'] ?? "Failed")),
-                    );
-                  }
-                }
-              } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text("Error: $e")));
-                }
-              }
-            },
-            child: const Text("Save"),
-          ),
-        ],
-      ),
+                      // cuma tambahin profile_photo kalo user milih gambar baru
+                      if (_newImageBase64 != null) {
+                        dataToSend['profile_photo'] = _newImageBase64;
+                      }
+
+                      // TODO: ganti jd link pws
+                      final response = await request.postJson(
+                        'http://127.0.0.1:8000/account/edit-profile-mobile/',
+                        jsonEncode(dataToSend),
+                      );
+
+                      if (mounted) {
+                        Navigator.pop(context);
+
+                        if (response['status'] == true) {
+                          fetchProfile();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Profile Updated!")),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(response['message'] ?? "Failed"),
+                            ),
+                          );
+                        } 
+                      }                     
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                      }
+                    }
+                  },
+                  child: const Text("Save"),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
-  // munculin popup buat ganti password
   void showPasswordDialog() {
     String currentPass = "";
     String newPass = "";
@@ -263,18 +369,29 @@ class _ProfilePageState extends State<ProfilePage> {
               try {
                 // TODO: ganti jd link pws
                 final response = await request.post(
-                  'http://127.0.0.1:8000/account/delete-account/',
+                  'http://127.0.0.1:8000/account/delete-account-mobile/',
                   {},
                 );
 
                 if (mounted) {
                   Navigator.pop(context);
+                  // cek response dari server
                   if (response['status'] == true ||
                       response['success'] == true) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Account deleted.")),
+                      const SnackBar(
+                        content: Text("Account deleted successfully."),
+                        backgroundColor: Colors.green,
+                      ),
                     );
-                    // balikin ke halaman awal kalo akun dh kehapus
+                    // logout supaya navbar berubah ke versi not logged in
+                    await request.logout(
+                      'http://127.0.0.1:8000/account/logout-mobile/',
+                    );
+
+                    if (!mounted) return;
+
+                    // redirect ke halaman utama setelah hapus akun
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
@@ -286,17 +403,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          response['message'] ?? "Failed to delete",
+                          response['message'] ?? "Failed to delete account",
                         ),
+                        backgroundColor: Colors.red,
                       ),
                     );
                   }
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                  Navigator.pop(context); // tutup dialog kalo error
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Error: $e"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
               }
             },
@@ -315,10 +437,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final data = userProfile;
 
-    // safety check kalau data null (misal error network)
     if (data == null) {
-      return const Scaffold(
-        body: Center(child: Text("Failed to load profile.")),
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: const Center(child: Text("Failed to load profile.")),
       );
     }
 
@@ -343,12 +472,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      // navbar cuma muncul kalo lg liat profil sendiri (ga ada userid di parameter)
       bottomNavigationBar: widget.userId == null
           ? const BottomNavBarWidget()
           : null,
 
-      // kalo liat profil org lain, kasih tombol back di appbar
       appBar: widget.userId != null
           ? AppBar(
               backgroundColor: Colors.transparent,
@@ -446,7 +573,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     const SizedBox(width: 24),
 
-                                    // info nama & status akun
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -476,12 +602,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ],
                                 ),
 
-                                // tombol-tombol di header (cuma buat profil sendiri)
                                 if (isOwnProfile) ...[
                                   const SizedBox(height: 24),
                                   Row(
                                     children: [
-                                      // tombol edit profil (admin gabisa edit karena akun admin immutable)
                                       if (!isAdmin) ...[
                                         ElevatedButton(
                                           onPressed: showEditDialog,
@@ -504,8 +628,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                         const SizedBox(width: 12),
                                       ],
-
-                                      // tombol logout
                                       ElevatedButton(
                                         onPressed: handleLogout,
                                         style: ElevatedButton.styleFrom(
@@ -539,7 +661,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // basic info
                                 _sectionTitle("Basic Information"),
                                 const SizedBox(height: 16),
                                 _infoRow(
@@ -581,11 +702,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
                                 const SizedBox(height: 32),
 
-                                // account details
                                 _sectionTitle("Account Details"),
                                 const SizedBox(height: 16),
 
-                                // logic data sensitif -> cuma ditampilin kalo punya akses
                                 if (canSeeSensitive) ...[
                                   _infoRow("Email Address", data.email),
                                   const SizedBox(height: 16),
@@ -627,7 +746,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                 ] else ...[
-                                  // tampilan tersembunyi
                                   Center(
                                     child: Column(
                                       children: const [
@@ -649,7 +767,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(height: 32),
                                 const Divider(),
 
-                                // quick actions di bawah (cuma buat owner yg bukan admin)
                                 if (showActions) ...[
                                   _sectionTitle(
                                     "Quick Actions",
@@ -680,37 +797,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ],
                                   ),
-                                ],
-                                // TESTING PURPOSES (view account with id 2)
-                                _quickActionButton(
-                                  "View User ID 2",
-                                  Icons.person,
-                                  Colors.orange,
-                                  () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const ProfilePage(userId: 2),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                // TESTING PURPOSES (view account with id 3)
-                                _quickActionButton(
-                                  "View User ID 3",
-                                  Icons.person,
-                                  Colors.orange,
-                                  () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const ProfilePage(userId: 3),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                ],                                
                               ],
                             ),
                           ),
@@ -727,7 +814,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // widget kecil buat judul section
   Widget _sectionTitle(String title, {bool withLine = true}) {
     return Container(
       width: double.infinity,
@@ -750,7 +836,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // widget kecil buat baris info
   Widget _infoRow(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -772,7 +857,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // widget kecil buat tombol aksi
   Widget _quickActionButton(
     String label,
     IconData icon,
