@@ -3,6 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
 import 'package:sporticket_mobile/event/screens/event_list.dart';
+import 'package:sporticket_mobile/models/profile.dart';
 
 class ProfilePage extends StatefulWidget {
   final int? userId; // kalo null, berarti liat profil sendiri yg lg login
@@ -14,7 +15,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Map<String, dynamic>? userProfile;
+  Profile? userProfile;
   bool isLoading = true;
 
   final Color profileHeaderColor = const Color(0xFF537fb9);
@@ -30,11 +31,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final request = context.read<CookieRequest>();
     try {
       // TODO: ganti jd link pws
-      // endpoint buat liat profil sendiri
       String url = 'http://127.0.0.1:8000/account/profile-mobile/';
 
       // kalo ada userid yg dipassing, ganti url jd endpoint detail profil org lain
-      // ini endpoint untuk liat profil org lain
       if (widget.userId != null) {
         url = 'http://127.0.0.1:8000/account/profile-mobile/${widget.userId}/';
       }
@@ -43,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted) {
         setState(() {
           if (response['status'] == true) {
-            userProfile = response['data'];
+            userProfile = Profile.fromJson(response['data']);
           }
           isLoading = false;
         });
@@ -70,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: Colors.green,
           ),
         );
-        // redirect ke halaman event list & apus history navigasi biar ga bs back karena udh logout
+        // redirect ke halaman event list & apus history navigasi biar ga bs back
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const EventListPage()),
@@ -85,17 +84,18 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      }
     }
   }
 
   // munculin popup buat edit profil (nama & no hp)
   void showEditDialog() {
-    String name = userProfile?['name'] ?? "";
-    String phone = userProfile?['phone_number'] ?? "";
+    String name = userProfile?.name ?? "";
+    String phone = userProfile?.phoneNumber ?? "";
 
     showDialog(
       context: context,
@@ -145,10 +145,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   }
                 }
               } catch (e) {
-                if (mounted)
+                if (mounted) {
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                }
               }
             },
             child: const Text("Save"),
@@ -226,10 +227,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   }
                 }
               } catch (e) {
-                if (mounted)
+                if (mounted) {
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                }
               }
             },
             child: const Text("Change"),
@@ -291,10 +293,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   }
                 }
               } catch (e) {
-                if (mounted)
+                if (mounted) {
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                }
               }
             },
             child: const Text("Delete"),
@@ -310,27 +313,32 @@ class _ProfilePageState extends State<ProfilePage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final data = userProfile ?? {};
-    final bool isAdmin = (data['is_superuser'] == true);
+    final data = userProfile;
 
-    // logic display data sensitif (email, no hp)
-    final bool isOwnProfile = data['is_own_profile'] ?? true;
-    final bool canSeeSensitive = data['can_see_sensitive_data'] ?? true;
+    // safety check kalau data null (misal error network)
+    if (data == null) {
+      return const Scaffold(
+        body: Center(child: Text("Failed to load profile.")),
+      );
+    }
 
-    // logic tombol edit & delete -> cuma muncul kalo profil sendiri DAN bukan admin
+    final bool isAdmin = data.isSuperuser;
+
+    final bool isOwnProfile = data.isOwnProfile;
+    final bool canSeeSensitive = data.canSeeSensitiveData;
+
     final bool showActions = isOwnProfile && !isAdmin;
 
     // TODO: ganti jd link pws
-    final String photoUrl = data['profile_photo'] != null
-        ? "http://127.0.0.1:8000${data['profile_photo']}"
+    final String photoUrl = data.profilePhoto != null
+        ? "http://127.0.0.1:8000${data.profilePhoto}"
         : "";
 
-    // logic nama di header -> kalo admin tulisan namanya "admin", kalo user biasa ya nama dia
-    String headerDisplayName = data['name'] ?? "User";
+    String headerDisplayName = data.name;
     if (isAdmin) {
       headerDisplayName = "Admin";
-    } else if (headerDisplayName == "Not Set") {
-      headerDisplayName = data['username'] ?? "User";
+    } else if (headerDisplayName == "Not Set" || headerDisplayName.isEmpty) {
+      headerDisplayName = data.username;
     }
 
     return Scaffold(
@@ -362,7 +370,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
       body: Stack(
         children: [
-          // background image
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -372,7 +379,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
 
-          // card utama
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
@@ -405,9 +411,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Column(
                               children: [
                                 if (widget.userId != null)
-                                  const SizedBox(
-                                    height: 20,
-                                  ), // spasi buat tombol back
+                                  const SizedBox(height: 20),
                                 Row(
                                   children: [
                                     // foto profil
@@ -477,7 +481,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   const SizedBox(height: 24),
                                   Row(
                                     children: [
-                                      // tombol edit profil (admin gabisa edit)
+                                      // tombol edit profil (admin gabisa edit karena akun admin immutable)
                                       if (!isAdmin) ...[
                                         ElevatedButton(
                                           onPressed: showEditDialog,
@@ -540,7 +544,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(height: 16),
                                 _infoRow(
                                   "Full Name",
-                                  data['name'] ?? "Not set",
+                                  data.name.isNotEmpty ? data.name : "Not set",
                                 ),
                                 const SizedBox(height: 16),
                                 const Text(
@@ -581,16 +585,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                 _sectionTitle("Account Details"),
                                 const SizedBox(height: 16),
 
-                                // tampilan data sensitif kalo boleh liat (admin atau owner akun)
+                                // logic data sensitif -> cuma ditampilin kalo punya akses
                                 if (canSeeSensitive) ...[
-                                  _infoRow(
-                                    "Email Address",
-                                    data['email'] ?? "Not set",
-                                  ),
+                                  _infoRow("Email Address", data.email),
                                   const SizedBox(height: 16),
                                   _infoRow(
                                     "Phone Number",
-                                    data['phone_number'] ?? "Not set",
+                                    data.phoneNumber ?? "Not set",
                                   ),
                                   const SizedBox(height: 16),
 
@@ -615,9 +616,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      isAdmin
-                                          ? "Admin"
-                                          : (data['role'] ?? "Buyer"),
+                                      isAdmin ? "Admin" : data.role,
                                       style: TextStyle(
                                         color: isAdmin
                                             ? Colors.purple[800]
@@ -628,7 +627,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                 ] else ...[
-                                  // tampilan kalo ga boleh liat data sensitif (bukan admin atau bukan account owner)
+                                  // tampilan tersembunyi
                                   Center(
                                     child: Column(
                                       children: const [
@@ -650,7 +649,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(height: 32),
                                 const Divider(),
 
-                                // quick actions (cuma buat owner yg bukan admin karena account admin immutable)
+                                // quick actions di bawah (cuma buat owner yg bukan admin)
                                 if (showActions) ...[
                                   _sectionTitle(
                                     "Quick Actions",
@@ -682,6 +681,36 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ],
                                   ),
                                 ],
+                                // TESTING PURPOSES (view account with id 2)
+                                _quickActionButton(
+                                  "View User ID 2",
+                                  Icons.person,
+                                  Colors.orange,
+                                  () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ProfilePage(userId: 2),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                // TESTING PURPOSES (view account with id 3)
+                                _quickActionButton(
+                                  "View User ID 3",
+                                  Icons.person,
+                                  Colors.orange,
+                                  () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ProfilePage(userId: 3),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -698,7 +727,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // widget buat section title
+  // widget kecil buat judul section
   Widget _sectionTitle(String title, {bool withLine = true}) {
     return Container(
       width: double.infinity,
@@ -721,7 +750,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // widget buat row info label & value
+  // widget kecil buat baris info
   Widget _infoRow(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -743,7 +772,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // widget buat action button
+  // widget kecil buat tombol aksi
   Widget _quickActionButton(
     String label,
     IconData icon,
