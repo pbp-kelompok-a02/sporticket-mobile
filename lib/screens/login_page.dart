@@ -327,8 +327,8 @@ class _LoginPageState extends State<LoginPage> {
 
                                 const SizedBox(height: 24),
 
-                                // tombol login
-                                _isLoading
+                                  // tombol login
+                                  _isLoading
                                     ? const Center(
                                         child: CircularProgressIndicator(),
                                       )
@@ -424,15 +424,15 @@ class _LoginPageState extends State<LoginPage> {
                                               }
                                             }
                                           },
-                                          child: const Text(
-                                            'Login',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
+                                    child: const Text(
+                                      'Login',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
