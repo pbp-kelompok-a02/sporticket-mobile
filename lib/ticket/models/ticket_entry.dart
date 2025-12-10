@@ -12,7 +12,7 @@ class TicketEntry {
     String id;
     String eventId;
     String category;
-    int price;
+    double price;
     int stock;
     String html;
 

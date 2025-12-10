@@ -5,6 +5,9 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/event/models/event.dart';
 import 'package:sporticket_mobile/event/screens/event_form.dart';
 import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
+import 'package:sporticket_mobile/models/profile.dart';
+import 'package:sporticket_mobile/screens/login_page.dart';
+
 // TODO: Integrate user admin authentication
 // TODO: integrate ticket and reviews
 
@@ -20,6 +23,7 @@ class EventDetailPage extends StatefulWidget {
 class _EventDetailPageState extends State<EventDetailPage> {
   bool isLoading = true;
   bool isAdmin = false;
+  bool isLoggedIn = false;
 
   @override
   void initState() {
@@ -37,15 +41,31 @@ class _EventDetailPageState extends State<EventDetailPage> {
   Future<void> _checkAdminStatus() async {
     final request = Provider.of<CookieRequest>(context, listen: false);
 
-  final response = await request.get(
-    "http://localhost:8000/account/get-role-json/",
-  );
+    try {
+      final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
 
-  final role = response["role"] ?? "Buyer";
-    setState(() {
-      isAdmin = true; // Placeholder
-      isLoading = false;
-    });
+      if (response["status"] == true) {
+        final profile = Profile.fromJson(response["data"]);
+
+        setState(() {
+          isLoggedIn = true;       
+          isAdmin = profile.isSuperuser;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoggedIn = false;      
+          isAdmin = false;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoggedIn = false;
+        isAdmin = false;
+        isLoading = false;
+      });
+    }
   }
 
   // Delete event function
@@ -316,29 +336,42 @@ class _EventDetailPageState extends State<EventDetailPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TicketEntryListPage(
-                                    matchId: widget.event.matchId,
-                                  ),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.receipt_long),
-                            label: const Text('See Tickets'),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                      ],
+                    ),
+
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if (!isLoggedIn) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const LoginPage(),
+                            ),
+                            (route) => false,
+                          );  
+                          return;
+                        }
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TicketEntryListPage(
+                              matchId: widget.event.matchId,
                             ),
                           ),
-                        )
-                      ],
-                    )
+                        );
+                      },
+                      icon: const Icon(Icons.receipt_long),
+                      label: const Text('See Tickets'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  )  
                 ],
               ),
             ),
