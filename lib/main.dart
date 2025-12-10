@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-// import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
-import 'package:sporticket_mobile/ticket/prototype/event_entry_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 // TODO: import halaman list event kalo udh ada
+import 'package:sporticket_mobile/event/screens/event_list.dart';
+import 'package:sporticket_mobile/event/screens/event_form.dart';
 import 'package:sporticket_mobile/screens/login_page.dart'; // nanti dihapus kalo udh ada halaman list event
 
 void main() {
@@ -32,8 +32,7 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        // TODO: ganti LoginPage dengan halaman list event kalo udh ada
-        home: const EventEntryListPage(),
+        home: const EventListPage(),
       ),
     );
   }

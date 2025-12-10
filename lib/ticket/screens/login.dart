@@ -1,5 +1,5 @@
-import 'package:sporticket_mobile/ticket/prototype/event_entry_list.dart';
 import 'package:sporticket_mobile/ticket/screens/menu.dart';
+import 'package:sporticket_mobile/event/screens/event_list.dart';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -110,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => EventEntryListPage()),
+                                builder: (context) => EventListPage()),
                           );
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
