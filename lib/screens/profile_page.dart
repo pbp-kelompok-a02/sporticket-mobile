@@ -50,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       setState(() {
         if (response['status'] == true) {
-          userProfile = Profile.fromJson(response['data']);
+          userProfile = profileFromJson(response['data']);
         }
         isLoading = false;
       });
