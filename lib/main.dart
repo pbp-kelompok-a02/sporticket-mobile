@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/event/screens/event_list.dart';
@@ -19,6 +21,7 @@ class MyApp extends StatelessWidget {
       },
       child: MaterialApp(
         title: 'Sporticket',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF537FB9),
@@ -26,7 +29,6 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-
         home: const EventListPage(),
       ),
     );
