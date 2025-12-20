@@ -6,6 +6,7 @@ import 'package:sporticket_mobile/event/screens/event_detail.dart';
 import 'package:sporticket_mobile/event/widgets/event_card.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
 import 'package:sporticket_mobile/event/screens/event_form.dart';
+import 'package:sporticket_mobile/models/profile.dart';
 
 
 class EventListPage extends StatefulWidget {
@@ -20,11 +21,14 @@ class _EventListPageState extends State<EventListPage> {
   List<Events> allEvents = [];
   bool isLoading = true;
   String? errorMessage;
+  bool isAdmin = false;
+  bool isLoggedIn = false;
 
   @override
   void initState() {
     super.initState();
     _loadEvents();
+    _checkAdminStatus();
   }
 
   // load event function (useful for reload too)
@@ -51,6 +55,36 @@ class _EventListPageState extends State<EventListPage> {
     }
   }
 
+  Future<void> _checkAdminStatus() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+
+    try {
+      final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
+
+      if (response["status"] == true) {
+        final profile = Profile.fromJson(response["data"]);
+
+        setState(() {
+          isLoggedIn = true;
+          isAdmin = profile.isSuperuser;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoggedIn = false;
+          isAdmin = false;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoggedIn = false;
+        isAdmin = false;
+        isLoading = false;
+      });
+    }
+  }
+
   // Fetch event from django
   Future<List<Events>> fetchEventsFromBackend(CookieRequest request) async {
     // TODO: Replace the URL with your app's URL and don't forget to add a trailing slash (/)
@@ -74,9 +108,6 @@ class _EventListPageState extends State<EventListPage> {
             print('Error parsing event JSON: $e');
           }
         }
-      }
-      for (Events e in listEvents) {
-        print(e.matchId);
       }
       return listEvents;
     } catch (e) {
@@ -406,9 +437,9 @@ class _EventListPageState extends State<EventListPage> {
         ),
       ),
 
-      // Create Event
-      // TODO: Integrate with admin authentication
-      floatingActionButton: FloatingActionButton(
+      // create event admin crud (test later)
+      floatingActionButton: isAdmin
+          ? FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
@@ -417,7 +448,6 @@ class _EventListPageState extends State<EventListPage> {
             ),
           ).then((createdEvent) {
             if (createdEvent == true) {
-              // Refresh the event list after creating new event
               _loadEvents();
             }
           });
@@ -426,7 +456,8 @@ class _EventListPageState extends State<EventListPage> {
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
         tooltip: 'Create New Event',
-      ),
+      )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
       // temporary navbar
