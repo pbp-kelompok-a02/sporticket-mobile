@@ -26,7 +26,7 @@ class TicketEntry {
     });
 
     factory TicketEntry.fromJson(Map<String, dynamic> json) => TicketEntry(
-        id: json["id"],
+        id: json["id"].toString(),
         eventId: json["event_id"],
         category: json["category"],
         price: json["price"],
