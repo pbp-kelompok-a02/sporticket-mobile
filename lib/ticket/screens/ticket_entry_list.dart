@@ -7,6 +7,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/ticket/screens/edit_ticket.dart';
 import 'package:sporticket_mobile/models/profile.dart';
 import 'package:http/http.dart' as http;
+import 'package:sporticket_mobile/order/create_order.dart';
 
 class TicketEntryListPage extends StatefulWidget {
   final String matchId;
@@ -116,14 +117,19 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
 
                   return TicketEntryCard(
                     ticket: ticket,
-                    onTap: () {
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(
-                          SnackBar(content: Text("You clicked on ${ticket.category}")),
-                        );
-                    },
-
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => OrderFormPage(
+                        tickets: [ticket], // TicketEntry
+                        eventName: "Loading event...",
+                        eventCategory: "Unknown",
+                        imagePath: "assets/event_banner.jpg",
+                      ),
+                    ),
+                  );
+                },
                     onEdit: () {
                       Navigator.push(
                         context,

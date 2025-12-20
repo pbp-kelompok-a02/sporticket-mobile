@@ -6,8 +6,13 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/event/screens/event_list.dart';
 
 void main() {
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.dumpErrorToConsole(details);
+  };
+
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
