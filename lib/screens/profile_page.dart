@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Import Image Picker
+import 'package:image_picker/image_picker.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
@@ -50,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       setState(() {
         if (response['status'] == true) {
-          userProfile = Profile.fromJson(response['data']);
+          userProfile = profileFromJson(json.encode(response['data']));
         }
         isLoading = false;
       });
@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final response = await request.logout(
         "http://127.0.0.1:8000/account/logout-mobile/",
       );
-      
+
       if (!mounted) return;
 
       if (response['status'] == true) {
@@ -116,10 +116,14 @@ class _ProfilePageState extends State<ProfilePage> {
       final String formattedBase64 = "data:$mimeType;base64,$base64Image";
 
       // pake setStateModal biar UI di dalem dialog ke-update
-      setStateModal(() {
-        _newImageBase64 = formattedBase64;
-        _newImageName = pickedFile.name;
-      });
+      try {
+        setStateModal(() {
+          _newImageBase64 = formattedBase64;
+          _newImageName = pickedFile.name;
+        });
+      } catch (e) {
+        // handle error
+      }
     }
   }
 
@@ -137,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (BuildContext dialogContext) {
         // pake StatefulBuilder biar bisa setState di dalam dialog sehingga bisa update preview gambar
         return StatefulBuilder(
-          builder: (context, setStateModal) {
+          builder: (innerContext, setStateModal) {
             return AlertDialog(
               title: const Text("Edit Profile"),
               content: SingleChildScrollView(
@@ -158,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               color: Colors.grey[100],
                             ),
                             child: ClipOval(
-                              // logika nampilin gambar : kalo ada gambar baru, pake itu. kalo gaada, pake gambar lama. kalo gaada gambar lama, pake placeholder
+                              // logika nampilin gambar
                               child: _newImageBase64 != null
                                   ? Image.memory(
                                       base64Decode(
@@ -215,13 +219,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () async {
                     final request = context.read<CookieRequest>();
                     try {
-                      // siapin data yg mau dikirim
                       Map<String, dynamic> dataToSend = {
                         'name': name,
                         'phone_number': phone,
                       };
 
-                      // cuma tambahin profile_photo kalo user milih gambar baru
                       if (_newImageBase64 != null) {
                         dataToSend['profile_photo'] = _newImageBase64;
                       }
@@ -232,22 +234,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         jsonEncode(dataToSend),
                       );
 
-                      if (mounted) {
-                        Navigator.pop(context);
+                      if (!mounted) return;
 
-                        if (response['status'] == true) {
-                          fetchProfile();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Profile Updated!")),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(response['message'] ?? "Failed"),
-                            ),
-                          );
-                        } 
-                      }                     
+                      // tutup dialog menggunakan context halaman yang aman
+                      Navigator.pop(context);
+
+                      if (response['status'] == true) {
+                        fetchProfile();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Profile Updated!")),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(response['message'] ?? "Failed"),
+                          ),
+                        );
+                      }
                     } catch (e) {
                       if (mounted) {
                         ScaffoldMessenger.of(
@@ -314,23 +317,25 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                 );
 
-                if (mounted) {
-                  Navigator.pop(context);
-                  if (response['status'] == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Password changed!"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(response['message'] ?? "Failed"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
+                if (!mounted) return;
+
+                // tutup dialog menggunakan context halaman yang aman
+                Navigator.pop(context);
+
+                if (response['status'] == true) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Password changed!"),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(response['message'] ?? "Failed"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
               } catch (e) {
                 if (mounted) {
@@ -373,46 +378,47 @@ class _ProfilePageState extends State<ProfilePage> {
                   {},
                 );
 
-                if (mounted) {
-                  Navigator.pop(context);
-                  // cek response dari server
-                  if (response['status'] == true ||
-                      response['success'] == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Account deleted successfully."),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                    // logout supaya navbar berubah ke versi not logged in
-                    await request.logout(
-                      'http://127.0.0.1:8000/account/logout-mobile/',
-                    );
+                if (!mounted) return;
 
-                    if (!mounted) return;
+                // tutup dialog
+                Navigator.pop(context);
 
-                    // redirect ke halaman utama setelah hapus akun
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const EventListPage(),
+                // cek response dari server
+                if (response['status'] == true || response['success'] == true) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Account deleted successfully."),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  // logout supaya navbar berubah ke versi not logged in
+                  // TODO: ganti jd link pws
+                  await request.logout(
+                    'http://127.0.0.1:8000/account/logout-mobile/',
+                  );
+
+                  if (!mounted) return;
+
+                  // redirect ke halaman utama setelah hapus akun
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EventListPage(),
+                    ),
+                    (route) => false,
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        response['message'] ?? "Failed to delete account",
                       ),
-                      (route) => false,
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          response['message'] ?? "Failed to delete account",
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
               } catch (e) {
                 if (mounted) {
-                  Navigator.pop(context); // tutup dialog kalo error
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text("Error: $e"),
@@ -797,7 +803,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ],
                                   ),
-                                ],                                
+                                ],
                               ],
                             ),
                           ),
