@@ -8,6 +8,7 @@ import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
 import 'package:sporticket_mobile/models/profile.dart';
 import 'package:sporticket_mobile/screens/login_page.dart';
 import 'package:sporticket_mobile/widgets/app_bar.dart';
+import 'package:sporticket_mobile/review/widgets/review_preview_section.dart';
 
 // TODO: Integrate user admin authentication
 // TODO: integrate ticket and reviews
@@ -43,6 +44,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final request = Provider.of<CookieRequest>(context, listen: false);
 
     try {
+      // TODO: ganti link ke pws
       final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
 
       if (response["status"] == true) {
@@ -99,7 +101,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
         final request = Provider.of<CookieRequest>(context, listen: false);
 
         final response = await request.postJson(
-          'http://localhost:8000/events/delete-flutter/${widget.event.matchId}/',
+          // TODO: ganti link ke pws
+          'http://127.0.0.1:8000/events/delete-flutter/${widget.event.matchId}/',
           jsonEncode({}),
 
         );
@@ -384,6 +387,12 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 ],
               ),
             ),
+                  const SizedBox(height: 24),
+
+                  // --- Reviews Preview ---
+                  ReviewPreviewSection(
+                    matchId: widget.event.matchId.toString(),
+                  ),
           ],
         ),
       ),
