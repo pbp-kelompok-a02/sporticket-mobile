@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-class SporticketAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
+class SporticketAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final List<Widget>? actions;
 
   const SporticketAppBar({
     super.key,
     required this.title,
+    this.actions,
   });
 
   @override
@@ -24,8 +25,10 @@ class SporticketAppBar extends StatelessWidget
       foregroundColor: Colors.black,
       centerTitle: true,
       actions: [
+        if (actions != null) ...actions!,
+
         Padding(
-          padding: const EdgeInsets.only(right: 16.0),
+          padding: const EdgeInsets.only(right: 16.0, left: 8.0),
           child: Container(
             width: 40,
             height: 40,
@@ -37,6 +40,7 @@ class SporticketAppBar extends StatelessWidget
               child: Image.asset(
                 'assets/images/logo_sporticket.png',
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Icon(Icons.sports_soccer), 
               ),
             ),
           ),

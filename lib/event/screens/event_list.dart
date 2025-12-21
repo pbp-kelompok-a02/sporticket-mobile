@@ -7,7 +7,7 @@ import 'package:sporticket_mobile/event/widgets/event_card.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
 import 'package:sporticket_mobile/event/screens/event_form.dart';
 import 'package:sporticket_mobile/models/profile.dart';
-
+import 'package:sporticket_mobile/widgets/app_bar.dart';
 
 class EventListPage extends StatefulWidget {
   const EventListPage({super.key});
@@ -154,40 +154,7 @@ class _EventListPageState extends State<EventListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // wip appbar?
-        title: const Text(
-          'Upcoming Events',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade300, width: 1),
-              ),
-              // logo
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/images/logo_sporticket.png',
-                  width: 40,
-                  height: 40,
-                )
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: SporticketAppBar(title: 'Upcoming Events'),
       body: Container(
         // background image
         decoration: const BoxDecoration(
