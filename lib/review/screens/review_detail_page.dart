@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import '../models/review.dart';
 import '../widgets/review_entry_card.dart';
-import 'edit_review_page.dart'; 
+import 'edit_review_page.dart';
 import 'package:sporticket_mobile/screens/profile_page.dart';
+import 'package:sporticket_mobile/widgets/app_bar.dart';
 
 class ReviewDetailPage extends StatefulWidget {
   final String matchId;
@@ -57,7 +58,6 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
     if (confirm != true) return;
 
     // FIX: URL adjusted to match standard API pattern
-    // Use 10.0.2.2 for Android Emulator, 127.0.0.1 for Web
     final response = await request.post(
       'http://127.0.0.1:8000/review/${widget.matchId}/api/delete/${_currentReview.id}/',
       {},
@@ -65,16 +65,20 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
 
     if (mounted) {
       if (response['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Review deleted successfully'),
-          backgroundColor: Colors.green,
-        ));
-        Navigator.pop(context, true); 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Review deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context, true);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(response['message'] ?? 'Failed to delete'),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Failed to delete'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -101,7 +105,7 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Review updated!"), 
+            content: Text("Review updated!"),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 1),
           ),
@@ -121,16 +125,7 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
         Navigator.pop(context, _hasChanged);
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Review Detail"),
-          backgroundColor: Colors.indigo,
-          foregroundColor: Colors.white,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            // Manually handle back button to pass state
-            onPressed: () => Navigator.pop(context, _hasChanged),
-          ),
-        ),
+        appBar: const SporticketAppBar(title: "Review Detail"),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: ReviewCard(
@@ -138,18 +133,19 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
             review: _currentReview,
             isCurrentUser: widget.isCurrentUser,
             enableTruncation: false,
-            onTap: null, 
-            
+            onTap: null,
+
             onEdit: _handleEdit,
             onDelete: () => _handleDelete(request),
-            
+
             onProfileTap: () {
-               Navigator.push(
-                 context,
-                 MaterialPageRoute(
-                   builder: (context) => ProfilePage(userId: _currentReview.userId),
-                 ),
-               );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ProfilePage(userId: _currentReview.userId),
+                ),
+              );
             },
           ),
         ),

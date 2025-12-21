@@ -1,16 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart'; 
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:sporticket_mobile/widgets/app_bar.dart';
 
 class AddReviewPage extends StatefulWidget {
   final String matchId;
 
-
-  const AddReviewPage({
-    super.key, 
-    required this.matchId,
-  });
+  const AddReviewPage({super.key, required this.matchId});
 
   @override
   State<AddReviewPage> createState() => _AddReviewPageState();
@@ -29,9 +26,9 @@ class _AddReviewPageState extends State<AddReviewPage> {
       return;
     }
     if (_commentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please write a comment!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please write a comment!")));
       return;
     }
 
@@ -39,7 +36,8 @@ class _AddReviewPageState extends State<AddReviewPage> {
       _isLoading = true;
     });
 
-    final String url = 'http://127.0.0.1:8000/review/${widget.matchId}/api/add/';
+    final String url =
+        'http://127.0.0.1:8000/review/${widget.matchId}/api/add/';
 
     try {
       final response = await request.postJson(
@@ -50,7 +48,6 @@ class _AddReviewPageState extends State<AddReviewPage> {
         }),
       );
 
-      // pbp_django_auth parses the JSON response automatically into a Map
       if (response['status'] == 'success') {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -73,9 +70,9 @@ class _AddReviewPageState extends State<AddReviewPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
       }
     } finally {
       if (mounted) {
@@ -91,12 +88,8 @@ class _AddReviewPageState extends State<AddReviewPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Write a Review"),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView( // Added scroll view to prevent overflow
+      appBar: const SporticketAppBar(title: "Write a Review"),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +104,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
-            
+
             // Star Rating Section
             Center(
               child: Row(
@@ -138,9 +131,9 @@ class _AddReviewPageState extends State<AddReviewPage> {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Comment Section
             TextField(
               controller: _commentController,
@@ -154,9 +147,9 @@ class _AddReviewPageState extends State<AddReviewPage> {
                 fillColor: Colors.grey[50],
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Submit Button
             SizedBox(
               width: double.infinity,
@@ -175,7 +168,10 @@ class _AddReviewPageState extends State<AddReviewPage> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                         "Submit Review",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
               ),
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/review.dart';
-// import 'package:sporticket_mobile/screens/profile_page.dart'; // Hapus jika tidak dipakai langsung di sini
 
 class ReviewCard extends StatelessWidget {
   final String matchId;
@@ -127,7 +126,7 @@ class ReviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: onTap, // Tap Card Utama
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -141,7 +140,6 @@ class ReviewCard extends StatelessWidget {
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        // Membuat area sentuh bulat
                         borderRadius: BorderRadius.circular(22), 
                         onTap: onProfileTap, 
                         child: Container(

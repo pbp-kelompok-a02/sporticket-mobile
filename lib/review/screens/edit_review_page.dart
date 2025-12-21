@@ -2,16 +2,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import '../models/review.dart'; 
+import 'package:sporticket_mobile/widgets/app_bar.dart';
+import '../models/review.dart';
 
 class EditReviewPage extends StatefulWidget {
   final String matchId;
-  final Review existingReview; // Pass the review object to fill the form
+  final Review existingReview;
 
   const EditReviewPage({
-    super.key, 
-    required this.matchId, 
-    required this.existingReview
+    super.key,
+    required this.matchId,
+    required this.existingReview,
   });
 
   @override
@@ -28,7 +29,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
     super.initState();
     // Pre-fill the form with existing data
     _rating = widget.existingReview.rating;
-    _commentController = TextEditingController(text: widget.existingReview.komentar);
+    _commentController = TextEditingController(
+      text: widget.existingReview.komentar,
+    );
   }
 
   @override
@@ -39,15 +42,15 @@ class _EditReviewPageState extends State<EditReviewPage> {
 
   Future<void> submitEdit(CookieRequest request) async {
     if (_rating == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Rating cannot be zero!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Rating cannot be zero!")));
       return;
     }
     if (_commentController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Comment cannot be empty!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Comment cannot be empty!")));
       return;
     }
 
@@ -56,7 +59,8 @@ class _EditReviewPageState extends State<EditReviewPage> {
     });
 
     // URL
-    final String url = 'http://127.0.0.1:8000/review/${widget.matchId}/api/edit/${widget.existingReview.id}/';
+    final String url =
+        'http://127.0.0.1:8000/review/${widget.matchId}/api/edit/${widget.existingReview.id}/';
 
     try {
       final response = await request.postJson(
@@ -92,9 +96,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
       }
     } finally {
       if (mounted) {
@@ -110,11 +114,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Edit Review"),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
-      ),
+      appBar: const SporticketAppBar(title: "Edit Review"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -130,7 +130,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
-            
+
             // Star Rating Section
             Center(
               child: Row(
@@ -157,9 +157,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Comment Section
             TextField(
               controller: _commentController,
@@ -173,9 +173,9 @@ class _EditReviewPageState extends State<EditReviewPage> {
                 fillColor: Colors.grey[50],
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Save Button
             SizedBox(
               width: double.infinity,
@@ -193,7 +193,10 @@ class _EditReviewPageState extends State<EditReviewPage> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                         "Save Changes",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
               ),
             ),

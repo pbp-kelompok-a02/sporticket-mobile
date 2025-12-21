@@ -8,6 +8,7 @@ import 'review_detail_page.dart';
 import 'edit_review_page.dart';
 import 'package:sporticket_mobile/screens/profile_page.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
+import 'package:sporticket_mobile/widgets/app_bar.dart';
 
 class ReviewListPage extends StatefulWidget {
   final String matchId;
@@ -83,16 +84,14 @@ class _ReviewListPageState extends State<ReviewListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const SporticketAppBar(title: 'Reviews'),
       // Gradient Background
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.white,
-              Color(0xFFE3F2FD), // Very light blue at bottom
-            ],
+            colors: [Colors.white, Color(0xFFE3F2FD)],
           ),
         ),
         child: SafeArea(
@@ -189,7 +188,7 @@ class _ReviewListPageState extends State<ReviewListPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // --- "ADD REVIEW" BUTTON (Conditional) ---
+                  // --- "ADD REVIEW" BUTTON ---
                   if (userHasTicket) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -219,7 +218,7 @@ class _ReviewListPageState extends State<ReviewListPage> {
                             textStyle: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              fontFamily: 'Kanit', // Assuming you use this font
+                              fontFamily: 'Kanit',
                             ),
                           ),
                         ),

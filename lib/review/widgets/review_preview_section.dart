@@ -49,7 +49,6 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
     };
   }
 
-  // Logic Delete (Sama seperti di List Page, agar tombol delete di preview berfungsi)
   Future<void> _deleteReview(int reviewId) async {
     final request = context.read<CookieRequest>();
     final response = await request.post(
@@ -65,7 +64,7 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
             backgroundColor: Colors.green,
           ),
         );
-        _refreshData(); // Refresh preview setelah delete
+        _refreshData();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -94,7 +93,6 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
         final bool userHasTicket = data['user_has_ticket'];
         final int totalCount = data['total_count'];
 
-        // LOGIC: Ambil 3 review teratas (sesuai urutan API)
         final previewReviews = allReviews.take(3).toList();
 
         return Container(
@@ -176,7 +174,6 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
                       );
                     },
 
-                    // 4. Logic Delete Button di Card Preview -> Hapus langsung
                     onDelete: () {
                       showDialog(
                         context: context,
@@ -208,7 +205,6 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
               const SizedBox(height: 20),
 
               // --- BUTTON: SHOW MORE REVIEWS ---
-              // Redirect ke Review List Page
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

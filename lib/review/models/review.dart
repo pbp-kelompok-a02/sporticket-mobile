@@ -52,14 +52,12 @@ class Review {
     komentar: json["komentar"],
     createdAt: DateTime.parse(json["created_at"]),
     isCurrentUser: json["is_current_user"] ?? false,
-    // prefix it with the local server host so Image.network can load it.
     profilePhoto: (() {
       final raw = json["profile_photo"] ?? '';
       if (raw == null) return '';
       String s = raw.toString();
       if (s.isEmpty) return '';
       if (s.startsWith('http')) return s;
-      // If backend returned a relative URL like '/media/...', prefix with host
       if (s.startsWith('/')) return 'http://127.0.0.1:8000' + s;
       return 'http://127.0.0.1:8000/' + s;
     })(),
