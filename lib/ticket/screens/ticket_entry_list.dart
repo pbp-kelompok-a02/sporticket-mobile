@@ -9,6 +9,7 @@ import 'package:sporticket_mobile/ticket/screens/ticketlist_form.dart';
 import 'package:sporticket_mobile/models/profile.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
 import 'package:sporticket_mobile/order/create_order.dart';
+import 'package:sporticket_mobile/widgets/app_bar.dart';
 
 class TicketEntryListPage extends StatefulWidget {
   final String matchId;
@@ -137,8 +138,8 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ticket List'),
+      appBar: SporticketAppBar(
+        title: 'Ticket List',
         actions: [
           if (isAdmin)
             IconButton(
