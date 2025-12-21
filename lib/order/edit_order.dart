@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:sporticket_mobile/order/create_order.dart';
+import 'package:sporticket_mobile/order/history.dart'; 
 import 'package:sporticket_mobile/ticket/models/ticket_entry.dart';
 
 class EditOrderPage extends StatefulWidget {
@@ -30,7 +31,7 @@ class _EditOrderPageState extends State<EditOrderPage> {
     final request = context.read<CookieRequest>();
 
     try {
-      // 1️⃣ Fetch ALL orders (already available endpoint)
+      // 1️⃣ Fetch ALL orders
       final response = await request.get(
         "http://127.0.0.1:8000/order/history-flutter/",
       );
@@ -39,37 +40,42 @@ class _EditOrderPageState extends State<EditOrderPage> {
         throw Exception("Invalid history response");
       }
 
-      // 2️⃣ Find the exact order
-      final orderJson = response.firstWhere(
-        (o) => o["order_id"] == widget.orderId,
+      // ✅ 2️⃣ PARSE TO MODEL FIRST
+      final orders = response
+          .map<OrderItem>((e) => OrderItem.fromJson(e))
+          .toList();
+
+      // ✅ 3️⃣ Find order using model
+      final order = orders.firstWhere(
+        (o) => o.orderId == widget.orderId,
         orElse: () => throw Exception("Order not found"),
       );
 
-      // 3️⃣ Build a SINGLE TicketEntry from order data
+      // ✅ 4️⃣ Build TicketEntry from model properties
       final ticket = TicketEntry(
-        id: orderJson["ticket_id"].toString(),
-        eventId: orderJson["event_id"].toString(),
-        category: orderJson["seating"].toString(),
-        price: double.parse(orderJson["ticket_price"].toString()),
-        stock: int.parse(orderJson["ticket_stock"].toString()),
+        id: order.ticketId,
+        eventId: "", // OrderItem doesn't have eventId, that's okay
+        category: order.seating,
+        price: order.ticketPrice.toDouble(),
+        stock: order.ticketStock,
         html: "",
       );
 
       if (!mounted) return;
 
-      // 4️⃣ Go to CREATE ORDER PAGE (but pre-filled)
+      // ✅ 5️⃣ Navigate using model properties
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => OrderFormPage(
-            tickets: [ticket], // ✅ EXACT ticket used
-            eventName: orderJson["event_name"],
-            eventCategory: orderJson["seating"],
-            imagePath: "assets/event_banner.jpg",
-
+            tickets: [ticket],
+            eventName: order.eventName,
+            eventCategory: _categorizeEvent(order.eventName),
+            imagePath: "",
+            
             // 🔑 EDIT MODE
             orderId: widget.orderId,
-            initialQuantity: orderJson["quantity"],
+            initialQuantity: order.quantity,
             initialTicketId: ticket.id,
           ),
         ),
@@ -82,14 +88,51 @@ class _EditOrderPageState extends State<EditOrderPage> {
     }
   }
 
+  // ✅ Helper method for event categorization
+  String _categorizeEvent(String eventName) {
+    final lower = eventName.toLowerCase();
+    if (lower.contains("football")) return "football";
+    if (lower.contains("basketball")) return "basketball";
+    if (lower.contains("badminton")) return "badminton";
+    if (lower.contains("tennis")) return "tennis";
+    if (lower.contains("volleyball")) return "volleyball";
+    return "football"; // default fallback
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This page is NEVER meant to be seen
     return Scaffold(
       body: Center(
         child: _loading
             ? const CircularProgressIndicator()
-            : Text("Edit failed: $_error"),
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, color: Colors.red, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Edit failed",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                      _error ?? "Unknown error",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Go Back"),
+                  ),
+                ],
+              ),
       ),
     );
   }
