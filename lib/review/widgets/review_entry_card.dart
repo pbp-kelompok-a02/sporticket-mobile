@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/review.dart';
-import 'package:sporticket_mobile/screens/profile_page.dart';
+// import 'package:sporticket_mobile/screens/profile_page.dart'; // Hapus jika tidak dipakai langsung di sini
 
 class ReviewCard extends StatelessWidget {
   final String matchId;
@@ -9,7 +9,7 @@ class ReviewCard extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final VoidCallback? onProfileTap;
-  final VoidCallback? onTap; // 
+  final VoidCallback? onTap;
   final bool enableTruncation;
 
   const ReviewCard({
@@ -20,10 +20,10 @@ class ReviewCard extends StatelessWidget {
     this.onEdit,
     this.onDelete,
     this.onProfileTap,
-    this.onTap, // <--- NEW
+    this.onTap,
     this.enableTruncation = true,
   }) : super(key: key);
-  
+
   Widget _buildStarRating(int rating) {
     return Row(
       children: [
@@ -57,8 +57,6 @@ class ReviewCard extends StatelessWidget {
 
   Widget _buildCommentSection() {
     const int truncateLength = 150;
-
-    // Check if text is long AND truncation is enabled
     if (enableTruncation && review.komentar.length > truncateLength) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,15 +73,13 @@ class ReviewCard extends StatelessWidget {
           const Text(
             "Read More",
             style: TextStyle(
-              color: Colors.indigo, 
-              fontWeight: FontWeight.bold, 
-              fontSize: 14
-            ),
+                color: Colors.indigo,
+                fontWeight: FontWeight.bold,
+                fontSize: 14),
           ),
         ],
       );
     } else {
-      // Show full text
       return Text(
         review.komentar,
         style: const TextStyle(
@@ -95,9 +91,23 @@ class ReviewCard extends StatelessWidget {
     }
   }
 
+  Widget _buildPlaceholderAvatar() {
+    return Container(
+      color: const Color(0xFFE0E7FF),
+      alignment: Alignment.center,
+      child: Text(
+        review.user.isNotEmpty ? review.user[0].toUpperCase() : 'U',
+        style: const TextStyle(
+          color: Color(0xFF4338CA),
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // We use Material + InkWell for the ripple effect on tap
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -117,7 +127,7 @@ class ReviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
+          onTap: onTap, // Tap Card Utama
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -127,44 +137,60 @@ class ReviewCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Avatar
-                    GestureDetector(
-                      onTap: onProfileTap,
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey.shade200, width: 1.5),
-                        ),
-                        child: ClipOval(
-                          child: review.profilePhoto.isNotEmpty
-                              ? Image.network(
-                                  review.profilePhoto,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      _buildPlaceholderAvatar(),
-                                )
-                              : _buildPlaceholderAvatar(),
+                    // --- AVATAR ---
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        // Membuat area sentuh bulat
+                        borderRadius: BorderRadius.circular(22), 
+                        onTap: onProfileTap, 
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: Colors.grey.shade200, width: 1.5),
+                          ),
+                          child: ClipOval(
+                            child: review.profilePhoto.isNotEmpty
+                                ? Image.network(
+                                    review.profilePhoto,
+                                    fit: BoxFit.cover,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            _buildPlaceholderAvatar(),
+                                  )
+                                : _buildPlaceholderAvatar(),
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 14),
                     
-                    // User Info
+                    const SizedBox(width: 14),
+
+                    // --- USER INFO ---
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          GestureDetector(
-                            onTap: onProfileTap,
-                            child: Text(
-                              review.user,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF111827),
-                                height: 1.2,
+                          // --- NAMA USER ---
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(4),
+                              onTap: onProfileTap,
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text(
+                                  review.user,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF111827),
+                                    height: 1.2,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -173,7 +199,7 @@ class ReviewCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    
+
                     // Date
                     Text(
                       _formatDate(review.createdAt),
@@ -185,12 +211,12 @@ class ReviewCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 // --- COMMENT SECTION ---
                 _buildCommentSection(),
-                
+
                 // --- ACTION BUTTONS (Edit/Delete) ---
                 if (isCurrentUser) ...[
                   const SizedBox(height: 20),
@@ -205,8 +231,10 @@ class ReviewCard extends StatelessWidget {
                         label: const Text('Edit'),
                         style: TextButton.styleFrom(
                           foregroundColor: const Color(0xFF2563EB),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
                           backgroundColor: const Color(0xFFEFF6FF),
                         ),
                       ),
@@ -217,8 +245,10 @@ class ReviewCard extends StatelessWidget {
                         label: const Text('Delete'),
                         style: TextButton.styleFrom(
                           foregroundColor: const Color(0xFFDC2626),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
                           backgroundColor: const Color(0xFFFEF2F2),
                         ),
                       ),
@@ -228,22 +258,6 @@ class ReviewCard extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-  
-  // (Helper function _buildPlaceholderAvatar stays the same)
-  Widget _buildPlaceholderAvatar() {
-    return Container(
-      color: const Color(0xFFE0E7FF), 
-      alignment: Alignment.center,
-      child: Text(
-        review.user.isNotEmpty ? review.user[0].toUpperCase() : 'U',
-        style: const TextStyle(
-          color: Color(0xFF4338CA), 
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
         ),
       ),
     );

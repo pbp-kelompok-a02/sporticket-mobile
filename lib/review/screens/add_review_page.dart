@@ -44,7 +44,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
     try {
       final response = await request.postJson(
         url,
-        jsonEncode({
+        jsonEncode(<String, dynamic>{
           "rating": _rating.toString(),
           "komentar": _commentController.text,
         }),

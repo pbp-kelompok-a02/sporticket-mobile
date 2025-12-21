@@ -7,6 +7,7 @@ import '../screens/review_list_page.dart';
 import '../screens/add_review_page.dart';
 import '../screens/review_detail_page.dart'; // Import Detail Page
 import '../screens/edit_review_page.dart'; // Import Edit Page
+import 'package:sporticket_mobile/screens/profile_page.dart';
 
 class ReviewPreviewSection extends StatefulWidget {
   final String matchId;
@@ -34,9 +35,11 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
 
   Future<Map<String, dynamic>> _fetchReviewData() async {
     final request = context.read<CookieRequest>();
-    // URL API 
-    final response = await request.get('http://127.0.0.1:8000/review/${widget.matchId}/api/');
-    
+    // URL API
+    final response = await request.get(
+      'http://127.0.0.1:8000/review/${widget.matchId}/api/',
+    );
+
     final reviewEntry = ReviewEntry.fromJson(response);
 
     return {
@@ -56,16 +59,20 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
 
     if (mounted) {
       if (response['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Review deleted successfully'),
-          backgroundColor: Colors.green,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Review deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
         _refreshData(); // Refresh preview setelah delete
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Failed to delete review'),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to delete review'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -92,7 +99,7 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
 
         return Container(
           padding: const EdgeInsets.all(16.0),
-          color: Colors.grey[50], 
+          color: Colors.grey[50],
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -100,9 +107,9 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
               const Text(
                 "Reviews",
                 style: TextStyle(
-                  fontSize: 28, 
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Serif', 
+                  fontFamily: 'Serif',
                   color: Color(0xFF1F2937),
                 ),
               ),
@@ -117,68 +124,86 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
               if (previewReviews.isEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Text("No reviews yet. Be the first!", style: TextStyle(color: Colors.grey)),
+                  child: Text(
+                    "No reviews yet. Be the first!",
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 )
               else
-                ...previewReviews.map((review) => ReviewCard(
-                      matchId: widget.matchId.toString(),
-                      review: review,
-                      
-                      isCurrentUser: review.isCurrentUser, 
-                      
-                      onTap: () async {
-                         final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ReviewDetailPage(
-                                matchId: widget.matchId.toString(),
-                                review: review,
-                                isCurrentUser: review.isCurrentUser,
+                ...previewReviews.map(
+                  (review) => ReviewCard(
+                    matchId: widget.matchId.toString(),
+                    review: review,
+
+                    isCurrentUser: review.isCurrentUser,
+
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReviewDetailPage(
+                            matchId: widget.matchId.toString(),
+                            review: review,
+                            isCurrentUser: review.isCurrentUser,
+                          ),
+                        ),
+                      );
+                      if (result == true) {
+                        _refreshData();
+                      }
+                    },
+
+                    onEdit: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditReviewPage(
+                            matchId: widget.matchId,
+                            existingReview: review,
+                          ),
+                        ),
+                      );
+                      if (result != null) _refreshData();
+                    },
+
+                    onProfileTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ProfilePage(userId: review.userId),
+                        ),
+                      );
+                    },
+
+                    // 4. Logic Delete Button di Card Preview -> Hapus langsung
+                    onDelete: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Delete Review'),
+                          content: const Text('Are you sure?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _deleteReview(review.id);
+                              },
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
                               ),
                             ),
-                          );
-                          if (result == true) {
-                            _refreshData();
-                          }
-                      },
-
-                      onEdit: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditReviewPage(
-                              matchId: widget.matchId, 
-                              existingReview: review,
-                            ),
-                          ),
-                        );
-                        if (result != null) _refreshData(); 
-                      },
-
-                      // 4. Logic Delete Button di Card Preview -> Hapus langsung
-                      onDelete: () {
-                         showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Delete Review'),
-                              content: const Text('Are you sure?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _deleteReview(review.id);
-                                  },
-                                  child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                                ),
-                              ],
-                            ),
-                          );
-                      },
-                    )),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
 
               const SizedBox(height: 20),
 
@@ -191,17 +216,26 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ReviewListPage(matchId: widget.matchId.toString()), // Convert int to String
+                        builder: (context) => ReviewListPage(
+                          matchId: widget.matchId.toString(),
+                        ), // Convert int to String
                       ),
-                    ).then((_) => _refreshData()); // Refresh preview saat kembali
+                    ).then(
+                      (_) => _refreshData(),
+                    ); // Refresh preview saat kembali
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF537FB9),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: const Text("Show More Reviews", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    "Show More Reviews",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
 
@@ -216,7 +250,9 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddReviewPage(matchId: widget.matchId.toString()), // Convert
+                          builder: (context) => AddReviewPage(
+                            matchId: widget.matchId.toString(),
+                          ), // Convert
                         ),
                       );
                       if (result == true) _refreshData();
@@ -227,7 +263,9 @@ class _ReviewPreviewSectionState extends State<ReviewPreviewSection> {
                       backgroundColor: const Color(0xFF10B981),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),

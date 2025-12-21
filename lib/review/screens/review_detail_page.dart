@@ -4,17 +4,20 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import '../models/review.dart';
 import '../widgets/review_entry_card.dart';
 import 'edit_review_page.dart'; 
+import 'package:sporticket_mobile/screens/profile_page.dart';
 
 class ReviewDetailPage extends StatefulWidget {
   final String matchId;
   final Review review;
   final bool isCurrentUser;
+  final int? userId;
 
   const ReviewDetailPage({
     super.key,
     required this.matchId,
     required this.review,
     required this.isCurrentUser,
+    this.userId,
   });
 
   @override
@@ -23,7 +26,7 @@ class ReviewDetailPage extends StatefulWidget {
 
 class _ReviewDetailPageState extends State<ReviewDetailPage> {
   late Review _currentReview;
-  bool _hasChanged = false; // Tracks if edits happened
+  bool _hasChanged = false;
 
   @override
   void initState() {
@@ -66,7 +69,6 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
           content: Text('Review deleted successfully'),
           backgroundColor: Colors.green,
         ));
-        // Return 'true' so the list page knows to refresh
         Navigator.pop(context, true); 
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -77,7 +79,7 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
     }
   }
 
-  // --- EDIT LOGIC (Option B: Update in Place) ---
+  // --- EDIT LOGIC ---
   Future<void> _handleEdit() async {
     final result = await Navigator.push(
       context,
@@ -89,12 +91,11 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
       ),
     );
 
-    // Check if we got updated data back (Map) from EditReviewPage
     if (result != null && result is Map) {
       setState(() {
         _currentReview.rating = result['rating'];
         _currentReview.komentar = result['komentar'];
-        _hasChanged = true; // Mark that changes occurred
+        _hasChanged = true;
       });
 
       if (mounted) {
@@ -113,7 +114,6 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    // PopScope ensures that when user presses Back, we send '_hasChanged' status
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) {
@@ -137,14 +137,19 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
             matchId: widget.matchId,
             review: _currentReview,
             isCurrentUser: widget.isCurrentUser,
-            enableTruncation: false, // Show full text in detail view
-            onTap: null, // Disable tapping the card itself (prevent recursion)
+            enableTruncation: false,
+            onTap: null, 
             
             onEdit: _handleEdit,
             onDelete: () => _handleDelete(request),
             
             onProfileTap: () {
-               // Add profile navigation if needed
+               Navigator.push(
+                 context,
+                 MaterialPageRoute(
+                   builder: (context) => ProfilePage(userId: _currentReview.userId),
+                 ),
+               );
             },
           ),
         ),

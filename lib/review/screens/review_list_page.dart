@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import '../models/review.dart';
-import '../widgets/review_entry_card.dart'; 
-import 'add_review_page.dart'; 
+import '../widgets/review_entry_card.dart';
+import 'add_review_page.dart';
 import 'review_detail_page.dart';
+import 'edit_review_page.dart';
+import 'package:sporticket_mobile/screens/profile_page.dart';
+import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
 
 class ReviewListPage extends StatefulWidget {
   final String matchId;
@@ -17,6 +20,7 @@ class ReviewListPage extends StatefulWidget {
 
 class _ReviewListPageState extends State<ReviewListPage> {
   bool _showMyReviewsOnly = false;
+  bool _sortOldest = false; // false = newest first, true = oldest first
   late Future<Map<String, dynamic>> _dataFuture;
 
   @override
@@ -35,7 +39,9 @@ class _ReviewListPageState extends State<ReviewListPage> {
   Future<Map<String, dynamic>> _fetchReviewData() async {
     final request = context.read<CookieRequest>();
     // Adjust URL to your specific endpoint
-    final response = await request.get('http://127.0.0.1:8000/review/${widget.matchId}/api/');
+    final response = await request.get(
+      'http://127.0.0.1:8000/review/${widget.matchId}/api/',
+    );
     final reviewEntry = ReviewEntry.fromJson(response);
 
     return {
@@ -55,17 +61,21 @@ class _ReviewListPageState extends State<ReviewListPage> {
     if (response['status'] == 'success') {
       _refreshData();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Review deleted successfully'),
-          backgroundColor: Colors.green,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Review deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Failed to delete review'),
-          backgroundColor: Colors.red,
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to delete review'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -110,20 +120,53 @@ class _ReviewListPageState extends State<ReviewListPage> {
                   ? allReviews.where((r) => r.isCurrentUser).toList()
                   : allReviews;
 
+              // Sorting: newest or oldest based on _sortOldest
+              final sortedReviews = List<Review>.from(displayedReviews)
+                ..sort(
+                  (a, b) => _sortOldest
+                      ? a.createdAt.compareTo(b.createdAt)
+                      : b.createdAt.compareTo(a.createdAt),
+                );
+
               return Column(
                 children: [
                   // --- CUSTOM APP BAR ---
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.indigo),
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: Colors.indigo,
+                          ),
                           onPressed: () => Navigator.pop(context),
                         ),
                         const Text(
                           "Back",
-                          style: TextStyle(color: Colors.indigo, fontSize: 16, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            color: Colors.indigo,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Spacer(),
+                        // Sort toggle: newest <-> oldest
+                        IconButton(
+                          icon: Icon(
+                            _sortOldest
+                                ? Icons.arrow_upward
+                                : Icons.arrow_downward,
+                            color: _sortOldest ? Colors.indigo : Colors.grey,
+                          ),
+                          tooltip: _sortOldest
+                              ? 'Sort: Oldest first'
+                              : 'Sort: Newest first',
+                          onPressed: () =>
+                              setState(() => _sortOldest = !_sortOldest),
                         ),
                       ],
                     ),
@@ -157,7 +200,8 @@ class _ReviewListPageState extends State<ReviewListPage> {
                             final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AddReviewPage(matchId: widget.matchId),
+                                builder: (context) =>
+                                    AddReviewPage(matchId: widget.matchId),
                               ),
                             );
                             if (result == true) _refreshData();
@@ -165,7 +209,7 @@ class _ReviewListPageState extends State<ReviewListPage> {
                           icon: const Icon(Icons.add, size: 18),
                           label: const Text("Add Your Review"),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF537FB9), 
+                            backgroundColor: const Color(0xFF537FB9),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
@@ -191,17 +235,17 @@ class _ReviewListPageState extends State<ReviewListPage> {
                       children: [
                         Expanded(
                           child: _buildFilterButton(
-                            "All Reviews", 
-                            !_showMyReviewsOnly, 
-                            () => setState(() => _showMyReviewsOnly = false)
+                            "All Reviews",
+                            !_showMyReviewsOnly,
+                            () => setState(() => _showMyReviewsOnly = false),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildFilterButton(
-                            "My Reviews", 
-                            _showMyReviewsOnly, 
-                            () => setState(() => _showMyReviewsOnly = true)
+                            "My Reviews",
+                            _showMyReviewsOnly,
+                            () => setState(() => _showMyReviewsOnly = true),
                           ),
                         ),
                       ],
@@ -222,7 +266,18 @@ class _ReviewListPageState extends State<ReviewListPage> {
                                 matchId: widget.matchId,
                                 review: review,
                                 isCurrentUser: review.isCurrentUser,
-                                
+                                onEdit: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditReviewPage(
+                                        matchId: widget.matchId,
+                                        existingReview: review,
+                                      ),
+                                    ),
+                                  );
+                                  if (result != null) _refreshData();
+                                },
                                 onTap: () async {
                                   final result = await Navigator.push(
                                     context,
@@ -247,7 +302,8 @@ class _ReviewListPageState extends State<ReviewListPage> {
                                       content: const Text('Are you sure?'),
                                       actions: [
                                         TextButton(
-                                          onPressed: () => Navigator.pop(context),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
                                           child: const Text('Cancel'),
                                         ),
                                         TextButton(
@@ -255,15 +311,23 @@ class _ReviewListPageState extends State<ReviewListPage> {
                                             Navigator.pop(context);
                                             _deleteReview(review.id);
                                           },
-                                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                          child: const Text(
+                                            'Delete',
+                                            style: TextStyle(color: Colors.red),
+                                          ),
                                         ),
                                       ],
                                     ),
                                   );
                                 },
                                 onProfileTap: () {
-                                  // Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(username: review.user)));
-                                  print("Profile tapped for ${review.user}");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProfilePage(userId: review.userId),
+                                    ),
+                                  );
                                 },
                               );
                             },
@@ -275,6 +339,7 @@ class _ReviewListPageState extends State<ReviewListPage> {
           ),
         ),
       ),
+      bottomNavigationBar: const BottomNavBarWidget(),
     );
   }
 
@@ -287,9 +352,15 @@ class _ReviewListPageState extends State<ReviewListPage> {
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFF537FB9) : const Color(0xFFE5E7EB),
           borderRadius: BorderRadius.circular(8),
-          boxShadow: isActive 
-            ? [BoxShadow(color: const Color(0xFF537FB9).withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 3))]
-            : [],
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF537FB9).withOpacity(0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : [],
         ),
         alignment: Alignment.center,
         child: Text(
