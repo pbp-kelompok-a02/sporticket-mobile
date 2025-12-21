@@ -332,7 +332,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                             setState(() => _isLoading = true);
 
                                             try {
-                                              // TODO: ganti ke link pws
                                               final response = await request.postJson(
                                                 "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/register-mobile/",
                                                 jsonEncode({
