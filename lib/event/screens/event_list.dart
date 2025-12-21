@@ -60,7 +60,7 @@ class _EventListPageState extends State<EventListPage> {
 
     try {
       // TODO: ganti link ke pws
-      final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
+      final response = await request.get("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/");
 
       if (response["status"] == true) {
         final profile = Profile.fromJson(response["data"]);
@@ -95,7 +95,7 @@ class _EventListPageState extends State<EventListPage> {
 
     try {
       // TODO: ganti link ke pws
-      final response = await request.get('http://127.0.0.1:8000/events/json/');
+      final response = await request.get('http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/json/');
 
       // Decode response to json format
       var data = response;

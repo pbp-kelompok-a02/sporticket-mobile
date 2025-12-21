@@ -163,10 +163,10 @@ class _EventFormPageState extends State<EventFormPage> {
         String url;
         if (widget.event == null) {
           // Create new event
-          url = 'http://127.0.0.1:8000/events/create-flutter/';
+          url = 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/create-flutter/';
         } else {
           // Update existing event
-          url = 'http://127.0.0.1:8000/events/update-flutter/${widget.event!.matchId}/';
+          url = 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/update-flutter/${widget.event!.matchId}/';
         }
 
 
