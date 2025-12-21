@@ -137,21 +137,6 @@ class _ReviewListPageState extends State<ReviewListPage> {
                     ),
                     child: Row(
                       children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back_ios_new,
-                            color: Colors.indigo,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        const Text(
-                          "Back",
-                          style: TextStyle(
-                            color: Colors.indigo,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
                         const Spacer(),
                         // Sort toggle: newest <-> oldest
                         IconButton(
