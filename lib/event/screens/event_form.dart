@@ -159,13 +159,14 @@ class _EventFormPageState extends State<EventFormPage> {
         };
 
         // Determine URL based on create/edit
+        // TODO: ganti link ke pws
         String url;
         if (widget.event == null) {
           // Create new event
-          url = 'http://localhost:8000/events/create-flutter/';
+          url = 'http://127.0.0.1:8000/events/create-flutter/';
         } else {
           // Update existing event
-          url = 'http://localhost:8000/events/update-flutter/${widget.event!.matchId}/';
+          url = 'http://127.0.0.1:8000/events/update-flutter/${widget.event!.matchId}/';
         }
 
 
