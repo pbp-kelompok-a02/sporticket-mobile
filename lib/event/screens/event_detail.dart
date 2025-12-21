@@ -7,6 +7,7 @@ import 'package:sporticket_mobile/event/screens/event_form.dart';
 import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
 import 'package:sporticket_mobile/models/profile.dart';
 import 'package:sporticket_mobile/screens/login_page.dart';
+import 'package:sporticket_mobile/review/widgets/review_preview_section.dart';
 
 // TODO: Integrate user admin authentication
 // TODO: integrate ticket and reviews
@@ -385,6 +386,12 @@ class _EventDetailPageState extends State<EventDetailPage> {
                 ],
               ),
             ),
+                  const SizedBox(height: 24),
+
+                  // --- Reviews Preview ---
+                  ReviewPreviewSection(
+                    matchId: widget.event.matchId.toString(),
+                  ),
           ],
         ),
       ),
