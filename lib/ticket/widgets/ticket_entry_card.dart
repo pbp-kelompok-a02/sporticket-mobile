@@ -34,6 +34,7 @@ class TicketEntryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        // Ketika stock = 0
         if (isSoldOut) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()

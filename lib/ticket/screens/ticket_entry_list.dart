@@ -6,7 +6,6 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/ticket/models/ticket_entry.dart';
 import 'package:sporticket_mobile/ticket/widgets/ticket_entry_card.dart';
 import 'package:sporticket_mobile/ticket/screens/ticketlist_form.dart';
-import 'package:sporticket_mobile/ticket/screens/edit_ticket.dart';
 import 'package:sporticket_mobile/models/profile.dart';
 import 'package:sporticket_mobile/event/widgets/bottom_navbar.dart';
 
@@ -43,8 +42,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
   }
 
   Future<void> fetchEvent(CookieRequest request) async {
-    final response =
-        await request.get("http://localhost:8000/events/json/");
+    final response = await request.get("http://localhost:8000/events/json/");
 
     final event = response.firstWhere(
       (e) => e['match_id'] == widget.matchId,
@@ -54,8 +52,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
     if (event != null) {
       setState(() {
         eventName = event['name'];
-        eventTeam =
-            "${event['home_team']} vs ${event['away_team']}";
+        eventTeam = "${event['home_team']} vs ${event['away_team']}";
         eventCategory = event['category'];
         if (event['date'] != null) {
           eventDate = DateTime.parse(event['date']); 
@@ -161,213 +158,234 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
         ],
       ),
       bottomNavigationBar: BottomNavBarWidget(),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 180,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(bannerAsset),
-                  fit: BoxFit.cover,
-                ),
+      body: Stack (
+        children: [
+          // Background
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/login-background.png'),
+                fit: BoxFit.cover,
               ),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                alignment: Alignment.bottomLeft,
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.45),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ===== EVENT NAME =====
-                    Text(
-                      eventName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
+            ),
+          ),
+
+          // Content
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(bannerAsset),
+                      fit: BoxFit.cover,
                     ),
-
-                    const SizedBox(height: 4),
-
-                    // ===== EVENT TEAM =====
-                    Text(
-                      eventTeam,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    alignment: Alignment.bottomLeft,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.45),
                     ),
-
-                    const SizedBox(height: 8),
-
-                    // ===== DATE =====
-                    Row(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.calendar_month,
-                            color: Colors.white, size: 16),
-                        const SizedBox(width: 6),
+                        // ===== EVENT NAME =====
                         Text(
-                          formattedEventDate,
+                          eventName,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 14,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        // ===== EVENT TEAM =====
+                        Text(
+                          eventTeam,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // ===== DATE =====
+                        Row(
+                          children: [
+                            const Icon(Icons.calendar_month,
+                                color: Colors.white, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              formattedEventDate,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        // ===== VENUE =====
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on,
+                                color: Colors.white, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              eventVenue,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                  ),
+                ),
 
-                    const SizedBox(height: 4),
+                // Seating Plan
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'SEATING PLAN',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
 
-                    // ===== VENUE =====
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on,
-                            color: Colors.white, size: 16),
-                        const SizedBox(width: 6),
-                        Text(
-                          eventVenue,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Image.asset(seatingPlanAsset),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: Text(
+                    'The seating plan above shows the arrangement of seats for this event. '
+                    'Please check your ticket category (VIP or Regular) to locate your designated area.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[700],
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // List Ticket
+                FutureBuilder<List<TicketEntry>>(
+                  future: fetchTicket(request),
+                  builder: (context, snapshot) {
+                    if (snapshot.data == null) {
+                      return const Center(child: CircularProgressIndicator());
+                    } 
+
+                    // Ketika list ticket kosong
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 64),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'images/ticket/no-ticket.png',
+                                width: 120,
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                'No ticket found',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Tickets for this event are not available yet.',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                      );
+                    }
 
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                'SEATING PLAN',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold
-                ),
-              ),
-            ),
+                    return Column(
+                      children: snapshot.data!.map((ticket) {
+                        return TicketEntryCard(
+                          ticket: ticket,
+                          eventCategory: eventCategory,
+                          isAdmin: isAdmin,
+                          // Menuju halaman order (user) atau edit (admin)
+                          onTap: () {
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(content: Text("You clicked on ${ticket.category}")),
+                              );
+                          },
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Image.asset(seatingPlanAsset),
-            ),
+                          // Menuju halaman edit
+                          onEdit: () async {
+                            final updated = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TicketFormPage(
+                                  matchId: widget.matchId,
+                                  ticket: ticket, 
+                                ),
+                              ),
+                            );
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Text(
-                'The seating plan above shows the arrangement of seats for this event. '
-                'Please check your ticket category (VIP or Regular) to locate your designated area.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                  height: 1.4,
-                ),
-              ),
-            ),
+                            if (updated == true) {
+                              setState(() {});
+                            }
+                          },
 
-            const SizedBox(height: 16),
+                          // Delete ticket
+                          onDelete: () async {
+                            final response = await http.post(
+                              Uri.parse("http://localhost:8000/ticket/delete-flutter/${ticket.id}/"),
+                            );
 
-            FutureBuilder<List<TicketEntry>>(
-              future: fetchTicket(request),
-              builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                  return const Center(child: CircularProgressIndicator());
-                } 
-
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 64),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'images/ticket/no-ticket.png',
-                            width: 120,
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'No ticket found',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Tickets for this event are not available yet.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                return Column(
-                  children: snapshot.data!.map((ticket) {
-                    return TicketEntryCard(
-                      ticket: ticket,
-                      eventCategory: eventCategory,
-                      isAdmin: isAdmin,
-                      onTap: () {
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(content: Text("You clicked on ${ticket.category}")),
-                          );
-                      },
-
-                      onEdit: () async {
-                        final updated = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => TicketFormPage(
-                              matchId: widget.matchId,
-                              ticket: ticket, 
-                            ),
-                          ),
+                            if (response.statusCode == 200) {
+                              setState(() {});
+                            } 
+                          },
                         );
-
-                        if (updated == true) {
-                          setState(() {});
-                        }
-                      },
-
-                      onDelete: () async {
-                        final response = await http.post(
-                          Uri.parse("http://localhost:8000/ticket/delete-flutter/${ticket.id}/"),
-                        );
-
-                        if (response.statusCode == 200) {
-                          setState(() {});
-                        } 
-                      },
+                      }).toList(),
                     );
-                  }).toList(),
-                );
-              },
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
+          ),
+        ],
+      )
     );
   }
 }
