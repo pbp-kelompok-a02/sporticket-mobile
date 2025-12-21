@@ -296,17 +296,17 @@ void initState() {
    String get seatingPlanAsset {
   switch (widget.eventCategory.toLowerCase()) {
     case 'football':
-      return 'images/ticket/football.png';
+      return 'assets/images/ticket/football.png';
     case 'basketball':
-      return 'images/ticket/basketball.png';
+      return 'assets/images/ticket/basketball.png';
     case 'badminton':
-      return 'images/ticket/badminton.png';
+      return 'assets/images/ticket/badminton.png';
     case 'tennis':
-      return 'images/ticket/tennis.png';
+      return 'assets/images/ticket/tennis.png';
     case 'volleyball':
-      return 'images/ticket/volleyball.png';
+      return 'assets/images/ticket/volleyball.png';
     default:
-      return 'images/ticket/football.png';
+      return 'assets/images/ticket/football.png';
   }
 }
    

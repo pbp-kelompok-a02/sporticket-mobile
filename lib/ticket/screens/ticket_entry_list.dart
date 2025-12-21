@@ -90,34 +90,34 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
   String get seatingPlanAsset {
     switch (eventCategory.toLowerCase()) {
       case 'football':
-        return 'images/ticket/football.png';
+        return 'assets/images/ticket/football.png';
       case 'basketball':
-        return 'images/ticket/basketball.png';
+        return 'assets/images/ticket/basketball.png';
       case 'badminton':
-        return 'images/ticket/badminton.png';
+        return 'assets/images/ticket/badminton.png';
       case 'tennis':
-        return 'images/ticket/tennis.png';
+        return 'assets/images/ticket/tennis.png';
       case 'volleyball':
-        return 'images/ticket/volleyball.png';
+        return 'assets/images/ticket/volleyball.png';
       default:
-        return 'images/ticket/football.png';
+        return 'assets/images/ticket/football.png';
     }
   }
 
   String get bannerAsset {
     switch (eventCategory.toLowerCase()) {
       case 'football':
-        return 'images/ticket/banner_football.jpeg';
+        return 'assets/images/ticket/banner_football.jpeg';
       case 'basketball':
-        return 'images/ticket/banner_basketball.jpeg';
+        return 'assets/images/ticket/banner_basketball.jpeg';
       case 'badminton':
-        return 'images/ticket/banner_badminton.jpeg';
+        return 'assets/images/ticket/banner_badminton.jpeg';
       case 'tennis':
-        return 'images/ticket/banner_tennis.jpeg';
+        return 'assets/images/ticket/banner_tennis.jpeg';
       case 'volleyball':
-        return 'images/ticket/banner_volleyball.jpeg';
+        return 'assets/images/ticket/banner_volleyball.jpeg';
       default:
-        return 'images/ticket/banner_football.jpeg';
+        return 'assets/images/ticket/banner_football.jpeg';
     }
   }
 
@@ -309,7 +309,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Image.asset(
-                                'images/ticket/no-ticket.png',
+                                'assets/images/ticket/no-ticket.png',
                                 width: 120,
                               ),
                               const SizedBox(height: 20),

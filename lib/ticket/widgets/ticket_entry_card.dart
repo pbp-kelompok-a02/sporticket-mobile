@@ -27,7 +27,7 @@ class TicketEntryCard extends StatelessWidget {
   String get ticketImage {
     final sport = eventCategory.toLowerCase();
     final type = ticket.category.toUpperCase();
-    return 'images/ticket/${type}_$sport.png';
+    return 'assets/images/ticket/${type}_$sport.png';
   }
 
   @override
@@ -85,7 +85,7 @@ class TicketEntryCard extends StatelessWidget {
                     child: Transform.rotate(
                       angle: -pi / 8,
                       child: Image.asset(
-                        'images/ticket/sold-out.png',
+                        'assets/images/ticket/sold-out.png',
                         width: 220,
                         fit: BoxFit.contain,
                       ),
