@@ -59,7 +59,7 @@ class _ReviewDetailPageState extends State<ReviewDetailPage> {
 
     // FIX: URL adjusted to match standard API pattern
     final response = await request.post(
-      'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/delete/${_currentReview.id}/',
+      'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/delete/${_currentReview.id}/',
       {},
     );
 

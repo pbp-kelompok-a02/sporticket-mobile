@@ -39,7 +39,7 @@ class EventCard extends StatelessWidget {
                   child: event.poster != null && event.poster!.isNotEmpty
                       ? Image.network(
                     // TODO: ganti link ke pws
-                    'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(event.poster!)}',
+                    'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(event.poster!)}',
                     height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,

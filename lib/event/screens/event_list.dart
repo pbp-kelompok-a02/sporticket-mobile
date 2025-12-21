@@ -60,7 +60,7 @@ class _EventListPageState extends State<EventListPage> {
 
     try {
       // TODO: ganti link ke pws
-      final response = await request.get("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/");
+      final response = await request.get("https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/");
 
       if (response["status"] == true) {
         final profile = Profile.fromJson(response["data"]);
@@ -88,14 +88,10 @@ class _EventListPageState extends State<EventListPage> {
 
   // Fetch event from django
   Future<List<Events>> fetchEventsFromBackend(CookieRequest request) async {
-    // TODO: Replace the URL with your app's URL and don't forget to add a trailing slash (/)
-    // To connect Android emulator with Django on localhost, use URL http://10.0.2.2:8000/
-    // If you're using Chrome, use URL http://localhost:8000/
-    // For physical device: Your server's actual IP address
 
     try {
       // TODO: ganti link ke pws
-      final response = await request.get('http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/json/');
+      final response = await request.get('https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/json/');
 
       // Decode response to json format
       var data = response;

@@ -45,7 +45,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
     try {
       // TODO: ganti link ke pws
-      final response = await request.get("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/");
+      final response = await request.get("https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/");
 
       if (response["status"] == true) {
         final profile = Profile.fromJson(response["data"]);
@@ -102,7 +102,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
         final response = await request.postJson(
           // TODO: ganti link ke pws
-          'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/delete-flutter/${widget.event.matchId}/',
+          'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/delete-flutter/${widget.event.matchId}/',
           jsonEncode({}),
 
         );
@@ -165,7 +165,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             // Image poster
             widget.event.poster != null && widget.event.poster!.isNotEmpty
                 ? Image.network(
-              'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(widget.event.poster!)}',
+              'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(widget.event.poster!)}',
               height: 250,
               width: double.infinity,
               fit: BoxFit.cover,
