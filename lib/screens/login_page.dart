@@ -382,13 +382,7 @@ class _LoginPageState extends State<LoginPage> {
                                                     ),
                                                   );
 
-                                                  Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const EventListPage(),
-                                                    ),
-                                                  );
+                                                  Navigator.pop(context, true);
                                                 } else {
                                                   ScaffoldMessenger.of(
                                                     context,

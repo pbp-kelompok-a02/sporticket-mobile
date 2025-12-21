@@ -343,16 +343,25 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {
+                      onPressed: () async {
                         if (!isLoggedIn) {
-                          Navigator.pushAndRemoveUntil(
+                          final loggedIn = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const LoginPage(),
+                              builder: (context) => const LoginPage(),
                             ),
-                            (route) => false,
-                          );  
+                          );
+
+                          if (loggedIn == true) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TicketEntryListPage(
+                                  matchId: widget.event.matchId,
+                                ),
+                              ),
+                            );
+                          }
                           return;
                         }
 
@@ -365,6 +374,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           ),
                         );
                       },
+
                       icon: const Icon(Icons.receipt_long),
                       label: const Text('See Tickets'),
                       style: ElevatedButton.styleFrom(
