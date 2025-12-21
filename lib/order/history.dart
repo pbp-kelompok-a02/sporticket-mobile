@@ -15,7 +15,7 @@ class OrderItem {
   final double price;
   final String status;
   final int ticketStock;
-  final int ticketPrice;
+  final double ticketPrice;
 
   OrderItem({
     required this.orderId,

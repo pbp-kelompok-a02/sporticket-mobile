@@ -56,7 +56,7 @@ class _EditOrderPageState extends State<EditOrderPage> {
         id: order.ticketId,
         eventId: "", // OrderItem doesn't have eventId, that's okay
         category: order.seating,
-        price: order.ticketPrice.toDouble(),
+        price: order.ticketPrice,
         stock: order.ticketStock,
         html: "",
       );
