@@ -58,8 +58,8 @@ class Review {
       String s = raw.toString();
       if (s.isEmpty) return '';
       if (s.startsWith('http')) return s;
-      if (s.startsWith('/')) return 'http://127.0.0.1:8000' + s;
-      return 'http://127.0.0.1:8000/' + s;
+      if (s.startsWith('/')) return 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id' + s;
+      return 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/' + s;
     })(),
   );
 

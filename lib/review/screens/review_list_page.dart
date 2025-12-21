@@ -41,7 +41,7 @@ class _ReviewListPageState extends State<ReviewListPage> {
     final request = context.read<CookieRequest>();
     // Adjust URL to your specific endpoint
     final response = await request.get(
-      'http://127.0.0.1:8000/review/${widget.matchId}/api/',
+      'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/',
     );
     final reviewEntry = ReviewEntry.fromJson(response);
 
@@ -55,7 +55,7 @@ class _ReviewListPageState extends State<ReviewListPage> {
   Future<void> _deleteReview(int reviewId) async {
     final request = context.read<CookieRequest>();
     final response = await request.post(
-      'http://127.0.0.1:8000/review/${widget.matchId}/api/delete/$reviewId/',
+      'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/delete/$reviewId/',
       {},
     );
 

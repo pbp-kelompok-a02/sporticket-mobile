@@ -334,7 +334,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             try {
                                               // TODO: ganti ke link pws
                                               final response = await request.postJson(
-                                                "http://127.0.0.1:8000/account/register-mobile/",
+                                                "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/register-mobile/",
                                                 jsonEncode({
                                                   'name': _nameController.text,
                                                   'email':
