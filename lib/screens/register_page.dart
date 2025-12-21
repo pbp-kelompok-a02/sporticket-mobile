@@ -368,13 +368,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                                           Colors.green,
                                                     ),
                                                   );
-                                                  // Navigator.pushReplacement(
-                                                  //   context,
-                                                  //   MaterialPageRoute(
-                                                  //     builder: (context) =>
-                                                  //         const LoginPage(),
-                                                  //   ),
-                                                  // );
                                                   Navigator.pop(context, true);
                                                 } else {
                                                   ScaffoldMessenger.of(
