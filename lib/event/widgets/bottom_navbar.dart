@@ -4,6 +4,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/event/screens/event_list.dart';
 import 'package:sporticket_mobile/screens/login_page.dart';
 import 'package:sporticket_mobile/screens/profile_page.dart';
+import 'package:sporticket_mobile/order/history.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
   const BottomNavBarWidget({super.key});
@@ -71,7 +72,17 @@ class BottomNavBarWidget extends StatelessWidget {
         // [History, Home, Profile]
         switch (index) {
           case 0:
-            // TODO: history page
+             if (currentIndex != 0) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const OrderHistoryPage(),
+              settings: const RouteSettings(name: '/history'),
+            ),
+            (route) => false,
+          );
+        }
+            
             break;
           case 1:
             if (currentIndex != 1) {
