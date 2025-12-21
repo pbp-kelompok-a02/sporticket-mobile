@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -394,9 +395,18 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
                               Uri.parse("http://localhost:8000/ticket/delete-flutter/${ticket.id}/"),
                             );
 
-                            if (response.statusCode == 200) {
+                            final data = jsonDecode(response.body);
+
+                            if (response.statusCode == 200 && data['status'] == 'success') {
                               setState(() {});
-                            } 
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Ticket deleted successfully")),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(data['message'] ?? "Failed to delete ticket")),
+                              );
+                            }
                           },
                         );
                       }).toList(),
