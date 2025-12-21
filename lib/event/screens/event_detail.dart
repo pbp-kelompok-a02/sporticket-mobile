@@ -45,7 +45,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
     try {
       // TODO: ganti link ke pws
-      final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
+      final response = await request.get("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/");
 
       if (response["status"] == true) {
         final profile = Profile.fromJson(response["data"]);
@@ -102,19 +102,29 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
         final response = await request.postJson(
           // TODO: ganti link ke pws
-          'http://127.0.0.1:8000/events/delete-flutter/${widget.event.matchId}/',
+          'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/delete-flutter/${widget.event.matchId}/',
           jsonEncode({}),
 
         );
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Event deleted successfully'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pop(context, true); // Return true to refresh parent
+          if (response['status'] == 'success') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(response['message'] ?? 'Event deleted successfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.pop(context, true);
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(response['message'] ?? 'Failed to delete event'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
         }
       } catch (e) {
         if (mounted) {
@@ -155,7 +165,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
             // Image poster
             widget.event.poster != null && widget.event.poster!.isNotEmpty
                 ? Image.network(
-              'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(widget.event.poster!)}',
+              'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(widget.event.poster!)}',
               height: 250,
               width: double.infinity,
               fit: BoxFit.cover,

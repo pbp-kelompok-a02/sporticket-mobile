@@ -35,7 +35,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
     final request = context.read<CookieRequest>();
 
     try {
-      final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
+      final response = await request.get("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/");
 
       if (response["status"] == true) {
         final profile = Profile.fromJson(response["data"]);
@@ -45,7 +45,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
   }
 
   Future<void> fetchEvent(CookieRequest request) async {
-    final response = await request.get("http://localhost:8000/events/json/");
+    final response = await request.get("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/json/");
 
     final event = response.firstWhere(
       (e) => e['match_id'] == widget.matchId,
@@ -66,7 +66,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
   }
 
   Future<List<TicketEntry>> fetchTicket(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/ticket/json/${widget.matchId}/');
+    final response = await request.get('http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/ticket/json/${widget.matchId}/');
     List<TicketEntry> listTicket = [];
 
     for (var d in response) {
@@ -393,7 +393,7 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
                           // Delete ticket
                           onDelete: () async {
                             final response = await http.post(
-                              Uri.parse("http://localhost:8000/ticket/delete-flutter/${ticket.id}/"),
+                              Uri.parse("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/ticket/delete-flutter/${ticket.id}/"),
                             );
 
                             final data = jsonDecode(response.body);

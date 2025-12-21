@@ -223,8 +223,8 @@ void initState() {
   }
   
       final url = isEdit
-          ? "http://127.0.0.1:8000/order/edit-flutter/${widget.orderId}/"
-          : "http://127.0.0.1:8000/order/create-flutter/${ticket.id}/";
+          ? "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/edit-flutter/${widget.orderId}/"
+          : "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/create-flutter/${ticket.id}/";
 
      final payload = isEdit
             ? {

@@ -38,10 +38,10 @@ class _ProfilePageState extends State<ProfilePage> {
     final request = context.read<CookieRequest>();
     try {
       // TODO: ganti jd link pws
-      String url = 'http://127.0.0.1:8000/account/profile-mobile/';
+      String url = 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/';
 
       if (widget.userId != null) {
-        url = 'http://127.0.0.1:8000/account/profile-mobile/${widget.userId}/';
+        url = 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/profile-mobile/${widget.userId}/';
       }
 
       final response = await request.get(url);
@@ -64,7 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       // TODO: ganti jd link pws
       final response = await request.logout(
-        "http://127.0.0.1:8000/account/logout-mobile/",
+        "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/logout-mobile/",
       );
 
       if (!mounted) return;
@@ -173,7 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   : (userProfile?.profilePhoto != null
                                         // TODO: ganti jd link pws
                                         ? Image.network(
-                                            "http://127.0.0.1:8000${userProfile!.profilePhoto!}",
+                                            "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id${userProfile!.profilePhoto!}",
                                             fit: BoxFit.cover,
                                           )
                                         : Image.asset(
@@ -230,7 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                       // TODO: ganti jd link pws
                       final response = await request.postJson(
-                        'http://127.0.0.1:8000/account/edit-profile-mobile/',
+                        'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/edit-profile-mobile/',
                         jsonEncode(dataToSend),
                       );
 
@@ -309,7 +309,7 @@ class _ProfilePageState extends State<ProfilePage> {
               try {
                 // TODO: ganti jd link pws
                 final response = await request.post(
-                  'http://127.0.0.1:8000/account/change-password-mobile/',
+                  'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/change-password-mobile/',
                   {
                     'current_password': currentPass,
                     'new_password': newPass,
@@ -374,7 +374,7 @@ class _ProfilePageState extends State<ProfilePage> {
               try {
                 // TODO: ganti jd link pws
                 final response = await request.post(
-                  'http://127.0.0.1:8000/account/delete-account-mobile/',
+                  'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/delete-account-mobile/',
                   {},
                 );
 
@@ -394,7 +394,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   // logout supaya navbar berubah ke versi not logged in
                   // TODO: ganti jd link pws
                   await request.logout(
-                    'http://127.0.0.1:8000/account/logout-mobile/',
+                    'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/logout-mobile/',
                   );
 
                   if (!mounted) return;
@@ -466,7 +466,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     // TODO: ganti jd link pws
     final String photoUrl = data.profilePhoto != null
-        ? "http://127.0.0.1:8000${data.profilePhoto}"
+        ? "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id${data.profilePhoto}"
         : "";
 
     String headerDisplayName = data.name;

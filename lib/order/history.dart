@@ -57,7 +57,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   // ---------------- FETCH HISTORY ----------------
   Future<List<OrderItem>> fetchOrders(CookieRequest request) async {
     final response = await request.get(
-      "http://127.0.0.1:8000/order/history-flutter/",
+      "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/history-flutter/",
     );
 
     if (response is! List) {
@@ -186,7 +186,7 @@ void _goToEditOrder(OrderItem order) {
                       final request = context.read<CookieRequest>();
 
                       final response = await request.post(
-                        "http://127.0.0.1:8000/order/confirm-flutter/${order.orderId}/",
+                        "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/confirm-flutter/${order.orderId}/",
                         {},
                       );
 
@@ -210,7 +210,7 @@ void _goToEditOrder(OrderItem order) {
                       final request = context.read<CookieRequest>();
 
                       final response = await request.post(
-                        "http://127.0.0.1:8000/order/cancel-flutter/${order.orderId}/",
+                        "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/cancel-flutter/${order.orderId}/",
                         {},
                       );
 

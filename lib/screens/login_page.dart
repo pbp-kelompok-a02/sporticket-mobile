@@ -84,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(20.0),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
+                          color: Color.fromRGBO(0, 0, 0, 0.3),
                           spreadRadius: 2,
                           blurRadius: 15,
                           offset: const Offset(0, 5),
@@ -327,8 +327,8 @@ class _LoginPageState extends State<LoginPage> {
 
                                 const SizedBox(height: 24),
 
-                                  // tombol login
-                                  _isLoading
+                                // tombol login
+                                _isLoading
                                     ? const Center(
                                         child: CircularProgressIndicator(),
                                       )
@@ -351,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
                                             try {
                                               // TODO: ganti ke link pws
                                               final response = await request.login(
-                                                "http://127.0.0.1:8000/account/login-mobile/",
+                                                "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/login-mobile/",
                                                 {
                                                   'username':
                                                       _emailController.text,
@@ -382,7 +382,23 @@ class _LoginPageState extends State<LoginPage> {
                                                     ),
                                                   );
 
-                                                  Navigator.pop(context, true);
+                                                  // kalo bisa pop, kita pop. kalo gak bisa, kita push replacement ke event list
+                                                  if (Navigator.canPop(
+                                                    context,
+                                                  )) {
+                                                    Navigator.pop(
+                                                      context,
+                                                      true,
+                                                    );
+                                                  } else {
+                                                    Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const EventListPage(),
+                                                      ),
+                                                    );
+                                                  }
                                                 } else {
                                                   ScaffoldMessenger.of(
                                                     context,
@@ -418,15 +434,15 @@ class _LoginPageState extends State<LoginPage> {
                                               }
                                             }
                                           },
-                                    child: const Text(
-                                      'Login',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                          child: const Text(
+                                            'Login',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
