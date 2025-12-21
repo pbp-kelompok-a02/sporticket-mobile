@@ -3,13 +3,16 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
+import 'package:sporticket_mobile/ticket/models/ticket_entry.dart';
 
 class TicketFormPage extends StatefulWidget {
     final String matchId;
+    final TicketEntry? ticket;
 
     const TicketFormPage({
       super.key,
       required this.matchId,
+      this.ticket,
     });
 
     @override
@@ -21,11 +24,51 @@ class _TicketFormPageState extends State<TicketFormPage> {
   String _category = "REG"; 
   double _price = 0.0;
   int _stock = 0;
+  String eventName = '';
+  bool isLoadingEvent = true;
+  late bool isEdit;
 
   final List<String> _categories = [
     'REG',
     'VIP'
   ];
+
+  Future<void> fetchEventName(CookieRequest request) async {
+    final response =
+        await request.get("http://localhost:8000/events/json/");
+
+    final event = response.firstWhere(
+      (e) => e['match_id'] == widget.matchId,
+      orElse: () => null,
+    );
+
+    if (event != null) {
+      setState(() {
+        eventName = event['name'];
+        isLoadingEvent = false;
+      });
+    } else {
+      setState(() {
+        eventName = '-';
+        isLoadingEvent = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final request = context.read<CookieRequest>();
+    fetchEventName(request);
+
+    isEdit = widget.ticket != null;
+
+    if (isEdit) {
+      _category = widget.ticket!.category;
+      _price = widget.ticket!.price;
+      _stock = widget.ticket!.stock;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +106,8 @@ class _TicketFormPageState extends State<TicketFormPage> {
                   Center(
                     child: Column(
                       children: [
-                        const Text(
-                          "Create New Ticket",
+                        Text(
+                          isEdit ? "Edit Ticket" : "Create New Ticket",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -72,9 +115,11 @@ class _TicketFormPageState extends State<TicketFormPage> {
                         ),
                         const SizedBox(height: 4),
 
-                        const Text(
-                          "Event: Nama Event",
-                          style: TextStyle(
+                        Text(
+                          isLoadingEvent
+                              ? "Event: Loading..."
+                              : "Event: $eventName",
+                          style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
                           ),
@@ -145,6 +190,7 @@ class _TicketFormPageState extends State<TicketFormPage> {
                           const SizedBox(height: 8),
 
                           TextFormField(
+                            initialValue: isEdit ? _price.toStringAsFixed(0) : '',
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               filled: true,
@@ -184,6 +230,7 @@ class _TicketFormPageState extends State<TicketFormPage> {
                           const SizedBox(height: 8),
 
                           TextFormField(
+                            initialValue: isEdit ? _stock.toString() : '',
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               filled: true,
@@ -248,8 +295,12 @@ class _TicketFormPageState extends State<TicketFormPage> {
                                 ),
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
+                                      final url = isEdit
+                                        ? "http://localhost:8000/ticket/edit-flutter/${widget.ticket!.id}/"
+                                        : "http://localhost:8000/ticket/create-flutter/";
+
                                       final response = await request.postJson(
-                                        "http://localhost:8000/ticket/create-flutter/",
+                                        url,
                                         jsonEncode({
                                           "event_id": widget.matchId,
                                           "category": _category,
@@ -273,8 +324,8 @@ class _TicketFormPageState extends State<TicketFormPage> {
                                       }
                                     }
                                   },
-                                child: const Text(
-                                  "Create Ticket",
+                                child: Text(
+                                  isEdit ? "Save Changes" : "Create Ticket",
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),
