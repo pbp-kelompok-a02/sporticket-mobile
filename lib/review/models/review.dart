@@ -58,8 +58,8 @@ class Review {
       String s = raw.toString();
       if (s.isEmpty) return '';
       if (s.startsWith('http')) return s;
-      if (s.startsWith('/')) return 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id' + s;
-      return 'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/' + s;
+      if (s.startsWith('/')) return 'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id' + s;
+      return 'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/' + s;
     })(),
   );
 

@@ -33,7 +33,7 @@ class _EditOrderPageState extends State<EditOrderPage> {
     try {
       // 1️⃣ Fetch ALL orders
       final response = await request.get(
-        "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/history-flutter/",
+        "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/history-flutter/",
       );
 
       if (response is! List) {

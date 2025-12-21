@@ -37,7 +37,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
     });
 
     final String url =
-        'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/add/';
+        'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/add/';
 
     try {
       final response = await request.postJson(

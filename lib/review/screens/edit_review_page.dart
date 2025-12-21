@@ -60,7 +60,7 @@ class _EditReviewPageState extends State<EditReviewPage> {
 
     // URL
     final String url =
-        'http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/edit/${widget.existingReview.id}/';
+        'https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/review/${widget.matchId}/api/edit/${widget.existingReview.id}/';
 
     try {
       final response = await request.postJson(

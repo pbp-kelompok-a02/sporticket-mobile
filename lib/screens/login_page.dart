@@ -351,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
                                             try {
                                               // TODO: ganti ke link pws
                                               final response = await request.login(
-                                                "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/login-mobile/",
+                                                "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/login-mobile/",
                                                 {
                                                   'username':
                                                       _emailController.text,

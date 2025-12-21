@@ -223,8 +223,8 @@ void initState() {
   }
   
       final url = isEdit
-          ? "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/edit-flutter/${widget.orderId}/"
-          : "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/create-flutter/${ticket.id}/";
+          ? "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/edit-flutter/${widget.orderId}/"
+          : "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/order/create-flutter/${ticket.id}/";
 
      final payload = isEdit
             ? {

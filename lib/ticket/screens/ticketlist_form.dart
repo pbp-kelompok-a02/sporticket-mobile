@@ -33,7 +33,7 @@ class _TicketFormPageState extends State<TicketFormPage> {
   ];
 
   Future<void> fetchEventName(CookieRequest request) async {
-    final response = await request.get("http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/json/");
+    final response = await request.get("https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/events/json/");
 
     final event = response.firstWhere(
       (e) => e['match_id'] == widget.matchId,
@@ -308,8 +308,8 @@ class _TicketFormPageState extends State<TicketFormPage> {
                                     onPressed: () async {
                                       if (_formKey.currentState!.validate()) {
                                         final url = isEdit
-                                          ? "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/ticket/edit-flutter/${widget.ticket!.id}/"
-                                          : "http://laudya-michelle-sporticket.pbp.cs.ui.ac.id/ticket/create-flutter/";
+                                          ? "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/ticket/edit-flutter/${widget.ticket!.id}/"
+                                          : "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/ticket/create-flutter/";
 
                                         final response = await request.postJson(
                                           url,
