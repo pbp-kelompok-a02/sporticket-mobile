@@ -341,12 +341,34 @@ class _TicketEntryListPageState extends State<TicketEntryListPage> {
                           eventCategory: eventCategory,
                           isAdmin: isAdmin,
                           // Menuju halaman order (user) atau edit (admin)
-                          onTap: () {
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(content: Text("You clicked on ${ticket.category}")),
+                          onTap: () async {
+                            if (isAdmin) {
+                              final updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => TicketFormPage(
+                                    matchId: widget.matchId,
+                                    ticket: ticket,
+                                  ),
+                                ),
                               );
+
+                              if (updated == true) {
+                                setState(() {});
+                              }
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => OrderFormPage(
+                                    tickets: [ticket],
+                                    eventName: eventName,
+                                    eventCategory: eventCategory,
+                                    imagePath: bannerAsset,
+                                  ),
+                                ),
+                              );
+                            }
                           },
 
                           // Menuju halaman edit
