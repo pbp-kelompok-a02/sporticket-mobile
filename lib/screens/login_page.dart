@@ -349,7 +349,6 @@ class _LoginPageState extends State<LoginPage> {
                                             setState(() => _isLoading = true);
 
                                             try {
-                                              // TODO: ganti ke link pws
                                               final response = await request.login(
                                                 "https://laudya-michelle-sporticket.pbp.cs.ui.ac.id/account/login-mobile/",
                                                 {
