@@ -357,7 +357,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         if (!isLoggedIn) {
-                          final loggedIn = await Navigator.push(
+                          final loggedIn = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const LoginPage(),
@@ -365,6 +365,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           );
 
                           if (loggedIn == true) {
+                            await _checkAdminStatus();
+
+                            if (!mounted) return;
+                            
                             Navigator.push(
                               context,
                               MaterialPageRoute(
