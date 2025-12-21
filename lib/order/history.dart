@@ -154,78 +154,81 @@ void _goToEditOrder(OrderItem order) {
           Text("Seating: ${order.seating}"),
           Text("Price: \$${order.price}"),
           const SizedBox(height: 10),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                order.status.toUpperCase(),
-                style: TextStyle(
-                  color: statusColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-             if (isPending)
-          Row(
-            children: [
-              TextButton.icon(
-                onPressed: () => _goToEditOrder(order),
-                icon: const Icon(Icons.edit),
-                label: const Text("Edit"),
-              ),
-
-              const SizedBox(width: 8),
-
-              TextButton.icon(
-                icon: const Icon(Icons.check),
-                label: const Text("Save Ticket"),
-                onPressed: () async {
-                  final request = context.read<CookieRequest>();
-
-                  final response = await request.post(
-                    "http://127.0.0.1:8000/order/confirm-flutter/${order.orderId}/",
-                    {},
-                  );
-
-                  if (response["success"] == true) {
-                    setState(() {}); // refresh history
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(response["error"])),
-                    );
-                  }
-                },
-              ),
-
-              const SizedBox(width: 8),
-
-              TextButton.icon(
-                icon: const Icon(Icons.cancel, color: Colors.red),
-                label: const Text(
-                  "Cancel",
-                  style: TextStyle(color: Colors.red),
-                ),
-                onPressed: () async {
-                  final request = context.read<CookieRequest>();
-
-                  final response = await request.post(
-                    "http://127.0.0.1:8000/order/cancel-flutter/${order.orderId}/",
-                    {},
-                  );
-
-                  if (response["success"] == true) {
-                    setState(() {}); // refresh history
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(response["error"])),
-                    );
-                  }
-                },
-              ),
-            ],
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            order.status.toUpperCase(),
+            style: TextStyle(
+              color: statusColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-            ],
-          ),
+
+          if (isPending)
+            Flexible(
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                alignment: WrapAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => _goToEditOrder(order),
+                    icon: const Icon(Icons.edit),
+                    label: const Text("Edit"),
+                  ),
+
+                  TextButton.icon(
+                    icon: const Icon(Icons.check),
+                    label: const Text("Save Ticket"),
+                    onPressed: () async {
+                      final request = context.read<CookieRequest>();
+
+                      final response = await request.post(
+                        "http://127.0.0.1:8000/order/confirm-flutter/${order.orderId}/",
+                        {},
+                      );
+
+                      if (response["success"] == true) {
+                        setState(() {});
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response["error"])),
+                        );
+                      }
+                    },
+                  ),
+
+                  TextButton.icon(
+                    icon: const Icon(Icons.cancel, color: Colors.red),
+                    label: const Text(
+                      "Cancel",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () async {
+                      final request = context.read<CookieRequest>();
+
+                      final response = await request.post(
+                        "http://127.0.0.1:8000/order/cancel-flutter/${order.orderId}/",
+                        {},
+                      );
+
+                      if (response["success"] == true) {
+                        setState(() {});
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response["error"])),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+        ],
+      )
+
         ],
       ),
     );
