@@ -1,18 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:pbp_django_auth/pbp_django_auth.dart'; 
+import 'package:provider/provider.dart';
 
 class AddReviewPage extends StatefulWidget {
-  final int matchId;
-  
-  // You must pass the session cookie or token here because 
-  // your Django view requires @login_required (request.user.is_authenticated)
-  final String userCookie; 
+  final String matchId;
+
 
   const AddReviewPage({
     super.key, 
-    required this.matchId, 
-    required this.userCookie
+    required this.matchId,
   });
 
   @override
@@ -24,8 +21,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
   final TextEditingController _commentController = TextEditingController();
   bool _isLoading = false;
 
-  // Function to send data to Django
-  Future<void> submitReview() async {
+  Future<void> submitReview(CookieRequest request) async {
     if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please select a star rating!")),
@@ -43,49 +39,33 @@ class _AddReviewPageState extends State<AddReviewPage> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('http://localhost:8000/review/api/reviews/${widget.matchId}/add/');
+    final String url = 'http://127.0.0.1:8000/review/${widget.matchId}/api/add/';
 
     try {
-      final response = await http.post(
+      final response = await request.postJson(
         url,
-        headers: {
-          "Content-Type": "application/json",
-          "Cookie": widget.userCookie, 
-        },
-        body: jsonEncode({
-          "rating": _rating,
+        jsonEncode({
+          "rating": _rating.toString(),
           "komentar": _commentController.text,
         }),
       );
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        
-        if (responseData['status'] == 'success') {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Review saved successfully!"),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.pop(context, true);
-          }
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(responseData['message'] ?? "Failed to save review"),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+      // pbp_django_auth parses the JSON response automatically into a Map
+      if (response['status'] == 'success') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Review saved successfully!"),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context, true);
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Error: ${response.statusCode}. Make sure you have a ticket!"),
+              content: Text(response['message'] ?? "Failed to save review"),
               backgroundColor: Colors.red,
             ),
           );
@@ -94,7 +74,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Network Error: $e")),
+          SnackBar(content: Text("Error: $e")),
         );
       }
     } finally {
@@ -108,13 +88,15 @@ class _AddReviewPageState extends State<AddReviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Write a Review"),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: SingleChildScrollView( // Added scroll view to prevent overflow
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +162,8 @@ class _AddReviewPageState extends State<AddReviewPage> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: _isLoading ? null : submitReview,
+                // Pass the 'request' object to the function
+                onPressed: _isLoading ? null : () => submitReview(request),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.indigo,
                   foregroundColor: Colors.white,

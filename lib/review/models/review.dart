@@ -31,6 +31,7 @@ class Review {
     String komentar;
     DateTime createdAt;
     bool isCurrentUser;
+    String profilePhoto;
 
     Review({
         required this.id,
@@ -38,7 +39,8 @@ class Review {
         required this.rating,
         required this.komentar,
         required this.createdAt,
-        this.isCurrentUser = false,
+        this.isCurrentUser = false, 
+        required this.profilePhoto,
     });
 
     factory Review.fromJson(Map<String, dynamic> json) => Review(
@@ -47,6 +49,7 @@ class Review {
         rating: json["rating"],
         komentar: json["komentar"],
         createdAt: DateTime.parse(json["created_at"]),
+        profilePhoto: json["profile_photo"] ?? '',
     );
 
     Map<String, dynamic> toJson() => {
@@ -55,5 +58,6 @@ class Review {
         "rating": rating,
         "komentar": komentar,
         "created_at": createdAt.toIso8601String(),
+        "profile_photo": profilePhoto,
     };
 }

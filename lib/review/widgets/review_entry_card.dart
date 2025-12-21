@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import '../models/review.dart';
+import 'package:sporticket_mobile/screens/profile_page.dart';
 
 class ReviewCard extends StatelessWidget {
+  final String matchId;
   final Review review;
   final bool isCurrentUser;
-  final String? profileImageUrl;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final VoidCallback? onProfileTap;
-  
+  final VoidCallback? onTap; // 
+  final bool enableTruncation;
+
   const ReviewCard({
     Key? key,
+    required this.matchId,
     required this.review,
     this.isCurrentUser = false,
-    this.profileImageUrl,
     this.onEdit,
     this.onDelete,
     this.onProfileTap,
+    this.onTap, // <--- NEW
+    this.enableTruncation = true,
   }) : super(key: key);
   
   Widget _buildStarRating(int rating) {
@@ -24,220 +29,221 @@ class ReviewCard extends StatelessWidget {
       children: [
         ...List.generate(5, (index) {
           return Icon(
-            index < rating ? Icons.star : Icons.star_border,
-            color: index < rating ? const Color(0xFFFBBF24) : const Color(0xFFD1D5DB),
+            index < rating ? Icons.star : Icons.star_rounded,
+            color: index < rating ? const Color(0xFFFBBF24) : const Color(0xFFE5E7EB),
             size: 20,
           );
         }),
-        
         const SizedBox(width: 8),
-        
         Text(
           '${review.rating}/5',
           style: const TextStyle(
             fontSize: 14,
+            fontWeight: FontWeight.w500,
             color: Color(0xFF6B7280),
           ),
         ),
       ],
     );
   }
-  
+
   String _formatDate(DateTime date) {
     const monthNames = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
-    
     return '${monthNames[date.month - 1]} ${date.day}, ${date.year}';
   }
-  
+
+  Widget _buildCommentSection() {
+    const int truncateLength = 150;
+
+    // Check if text is long AND truncation is enabled
+    if (enableTruncation && review.komentar.length > truncateLength) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "${review.komentar.substring(0, truncateLength)}...",
+            style: const TextStyle(
+              fontSize: 15,
+              color: Color(0xFF374151),
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            "Read More",
+            style: TextStyle(
+              color: Colors.indigo, 
+              fontWeight: FontWeight.bold, 
+              fontSize: 14
+            ),
+          ),
+        ],
+      );
+    } else {
+      // Show full text
+      return Text(
+        review.komentar,
+        style: const TextStyle(
+          fontSize: 15,
+          color: Color(0xFF374151),
+          height: 1.5,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // We use Material + InkWell for the ripple effect on tap
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: Colors.grey.shade100),
       ),
-
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Avatar with image or initial
-                GestureDetector(
-                  onTap: onProfileTap,
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: const Color(0xFF537FB9),
-                        width: 2,
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: profileImageUrl != null
-                          ? Image.network(
-                              profileImageUrl!,
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: const Color(0xFF537FB9),
-                                  child: Center(
-                                    child: Text(
-                                      review.user.isNotEmpty 
-                                          ? review.user[0].toUpperCase() 
-                                          : 'U',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                          : Container(
-                              color: const Color(0xFF537FB9),
-                              child: Center(
-                                child: Text(
-                                  review.user.isNotEmpty 
-                                      ? review.user[0].toUpperCase() 
-                                      : 'U',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(width: 12),
-                
-                // User info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: onProfileTap,
-                        child: Text(
-                          review.user,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F2937),
-                            fontFamily: 'Kanit',
-                          ),
+                // --- HEADER SECTION ---
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Avatar
+                    GestureDetector(
+                      onTap: onProfileTap,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.grey.shade200, width: 1.5),
+                        ),
+                        child: ClipOval(
+                          child: review.profilePhoto.isNotEmpty
+                              ? Image.network(
+                                  review.profilePhoto,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      _buildPlaceholderAvatar(),
+                                )
+                              : _buildPlaceholderAvatar(),
                         ),
                       ),
-                      
-                      const SizedBox(height: 4),
-                      
-                      _buildStarRating(review.rating),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 14),
+                    
+                    // User Info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: onProfileTap,
+                            child: Text(
+                              review.user,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF111827),
+                                height: 1.2,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          _buildStarRating(review.rating),
+                        ],
+                      ),
+                    ),
+                    
+                    // Date
+                    Text(
+                      _formatDate(review.createdAt),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF9CA3AF),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
                 
-                // Date
-                Text(
-                  _formatDate(review.createdAt),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF6B7280),
-                  ),
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // Review text
-            Text(
-              review.komentar,
-              style: const TextStyle(
-                fontSize: 15,
-                color: Color(0xFF374151),
-                height: 1.6,
-              ),
-            ),
-            
-            // Action buttons
-            if (isCurrentUser) ...[
-              const SizedBox(height: 16),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  // Edit button
-                  OutlinedButton(
-                    onPressed: onEdit,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF1D4ED8),
-                      side: const BorderSide(color: Color(0xFFDBEAFE)),
-                      backgroundColor: const Color(0xFFDBEAFE),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                const SizedBox(height: 16),
+                
+                // --- COMMENT SECTION ---
+                _buildCommentSection(),
+                
+                // --- ACTION BUTTONS (Edit/Delete) ---
+                if (isCurrentUser) ...[
+                  const SizedBox(height: 20),
+                  Divider(height: 1, color: Colors.grey.shade100),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: onEdit,
+                        icon: const Icon(Icons.edit_outlined, size: 16),
+                        label: const Text('Edit'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF2563EB),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          backgroundColor: const Color(0xFFEFF6FF),
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      textStyle: const TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Kanit',
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(width: 12),
+                      TextButton.icon(
+                        onPressed: onDelete,
+                        icon: const Icon(Icons.delete_outline, size: 16),
+                        label: const Text('Delete'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFFDC2626),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          backgroundColor: const Color(0xFFFEF2F2),
+                        ),
                       ),
-                    ),
-                    child: const Text('Edit'),
-                  ),
-                  
-                  const SizedBox(width: 8),
-                  
-                  // Delete button
-                  OutlinedButton(
-                    onPressed: onDelete,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFDC2626),
-                      side: const BorderSide(color: Color(0xFFFEE2E2)),
-                      backgroundColor: const Color(0xFFFEE2E2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      textStyle: const TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Kanit',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    child: const Text('Delete'),
+                    ],
                   ),
                 ],
-              ),
-            ],
-          ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+  
+  // (Helper function _buildPlaceholderAvatar stays the same)
+  Widget _buildPlaceholderAvatar() {
+    return Container(
+      color: const Color(0xFFE0E7FF), 
+      alignment: Alignment.center,
+      child: Text(
+        review.user.isNotEmpty ? review.user[0].toUpperCase() : 'U',
+        style: const TextStyle(
+          color: Color(0xFF4338CA), 
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
         ),
       ),
     );
