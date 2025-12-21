@@ -126,7 +126,7 @@ Flutter berfungsi sebagai aplikasi client yang mengakses API Django. Flutter mel
 
 **Tautan design** = https://www.figma.com/design/HXRRzkW7WdbLWYq2gYPcRV/PAS-PBP-A02?node-id=0-1&p=f&t=hoqW4dAuSgROBtpq-0
 
-**Tautan APK** = sporticket
+**Status Badge** = sporticket
 [![Build Status](https://app.bitrise.io/app/22bc4334-bd5c-4cd0-9e0c-1f0e4970bba1/status.svg?token=_z71TV6Y0tfCF_orDf1gxw&branch=master)](https://app.bitrise.io/app/22bc4334-bd5c-4cd0-9e0c-1f0e4970bba1)
 
-**Download aplikasi versi terbaru**: [DOWNLOAD APK] (https://app.bitrise.io/app/22bc4334-bd5c-4cd0-9e0c-1f0e4970bba1/installable-artifacts/0558b3e66f4b23a0/public-install-page/1db61361c9fd6c6a6e99f28bcfac15f3)
+**Download aplikasi versi terbaru**: [DOWNLOAD APK] (https://app.bitrise.io/app/22bc4334-bd5c-4cd0-9e0c-1f0e4970bba1/installable-artifacts/c6c85b6a98fb11bc/public-install-page/43b0f8b1e59b950c80183e4998d13e2a)
