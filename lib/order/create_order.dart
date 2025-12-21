@@ -107,8 +107,8 @@ void initState() {
                 ),
               ),
             ),
-            const SizedBox(height: 15),
-            _buildEventHeader(),
+            // const SizedBox(height: 15),
+            // _buildEventHeader(),
             const SizedBox(height: 20),
             Center(child: _buildStadiumImage()),
             const SizedBox(height: 30),
@@ -135,7 +135,29 @@ void initState() {
       ),
       child: Form(
         key: _formKey,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+           if (_notifMessage.isNotEmpty)
+            Container(
+              padding: EdgeInsets.all(12),
+              margin: EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: _notifColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error, color: Colors.white, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _notifMessage,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           const Text("Ticket Amount", style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
 
@@ -257,37 +279,35 @@ void initState() {
   }
 
   // ================= UI HELPERS =================
-  Widget _buildStadiumImage() =>
-      Image.asset(widget.imagePath, height: 220, fit: BoxFit.contain);
-
-  Widget _buildEventHeader() => Container(
-        height: 130,
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/event_banner.jpg"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: Text(
-              widget.eventName,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      );
+    Widget _buildStadiumImage() =>
+        Image.asset(
+          seatingPlanAsset,
+          height: 220,
+          fit: BoxFit.contain,
+        );
 
   Widget _buildBottomNavBar() => const SizedBox(height: 0);
 
   InputDecoration _inputDecoration() => const InputDecoration(
         border: OutlineInputBorder(),
       );
+
+
+   String get seatingPlanAsset {
+  switch (widget.eventCategory.toLowerCase()) {
+    case 'football':
+      return 'images/ticket/football.png';
+    case 'basketball':
+      return 'images/ticket/basketball.png';
+    case 'badminton':
+      return 'images/ticket/badminton.png';
+    case 'tennis':
+      return 'images/ticket/tennis.png';
+    case 'volleyball':
+      return 'images/ticket/volleyball.png';
+    default:
+      return 'images/ticket/football.png';
+  }
+}
+   
 }
