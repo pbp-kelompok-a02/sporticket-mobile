@@ -7,7 +7,6 @@ import 'package:sporticket_mobile/event/screens/event_form.dart';
 import 'package:sporticket_mobile/ticket/screens/ticket_entry_list.dart';
 import 'package:sporticket_mobile/models/profile.dart';
 import 'package:sporticket_mobile/screens/login_page.dart';
-import 'package:sporticket_mobile/review/widgets/review_preview_section.dart';
 
 // TODO: Integrate user admin authentication
 // TODO: integrate ticket and reviews
@@ -33,20 +32,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
   }
 
   String _formatDate(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${date.day} ${months[date.month - 1]} ${date.year}, ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
@@ -55,21 +42,19 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final request = Provider.of<CookieRequest>(context, listen: false);
 
     try {
-      final response = await request.get(
-        "http://127.0.0.1:8000/account/profile-mobile/",
-      );
+      final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
 
       if (response["status"] == true) {
         final profile = Profile.fromJson(response["data"]);
 
         setState(() {
-          isLoggedIn = true;
+          isLoggedIn = true;       
           isAdmin = profile.isSuperuser;
           isLoading = false;
         });
       } else {
         setState(() {
-          isLoggedIn = false;
+          isLoggedIn = false;      
           isAdmin = false;
           isLoading = false;
         });
@@ -85,14 +70,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   // Delete event function
   Future<void> _deleteEvent(BuildContext context) async {
+
     // confirmation message
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Event'),
-        content: const Text(
-          'Are you sure you want to delete this event? This action cannot be undone.',
-        ),
+        content: const Text('Are you sure you want to delete this event? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -100,7 +84,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -114,6 +100,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
         final response = await request.postJson(
           'http://localhost:8000/events/delete-flutter/${widget.event.matchId}/',
           jsonEncode({}),
+
         );
 
         if (mounted) {
@@ -128,7 +115,10 @@ class _EventDetailPageState extends State<EventDetailPage> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text('Error: $e'),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       }
@@ -137,6 +127,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
   // Navigate to edit page
   void _editEvent() {
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -152,7 +143,9 @@ class _EventDetailPageState extends State<EventDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Event Details')),
+      appBar: AppBar(
+        title: const Text('Event Details'),
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,36 +153,36 @@ class _EventDetailPageState extends State<EventDetailPage> {
             // Image poster
             widget.event.poster != null && widget.event.poster!.isNotEmpty
                 ? Image.network(
-                    'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(widget.event.poster!)}',
-                    height: 250,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 250,
-                        color: Colors.grey[300],
-                        child: Center(
-                          child: Icon(
-                            getCategoryIcon(widget.event.category),
-                            size: 80,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                // No image (icon only)
-                : Container(
-                    height: 250,
-                    color: Colors.grey[300],
-                    child: Center(
-                      child: Icon(
-                        getCategoryIcon(widget.event.category),
-                        size: 80,
-                        color: Colors.grey[400],
-                      ),
+              'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(widget.event.poster!)}',
+              height: 250,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 250,
+                  color: Colors.grey[300],
+                  child: Center(
+                    child: Icon(
+                      getCategoryIcon(widget.event.category),
+                      size: 80,
+                      color: Colors.grey[400],
                     ),
                   ),
+                );
+              },
+            )
+            // No image (icon only)
+                : Container(
+              height: 250,
+              color: Colors.grey[300],
+              child: Center(
+                child: Icon(
+                  getCategoryIcon(widget.event.category),
+                  size: 80,
+                  color: Colors.grey[400],
+                ),
+              ),
+            ),
             // Event name and category
             Padding(
               padding: const EdgeInsets.all(16),
@@ -205,17 +198,13 @@ class _EventDetailPageState extends State<EventDetailPage> {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Theme.of(context).primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      categoryValues.reverse[widget.event.category]!
-                          .toUpperCase(),
+                      categoryValues.reverse[widget.event.category]!.toUpperCase(),
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.bold,
@@ -289,29 +278,20 @@ class _EventDetailPageState extends State<EventDetailPage> {
 
                   // venue date and capacity info
                   const SizedBox(height: 24),
-                  _buildDetailRow(
-                    Icons.location_on,
-                    'Venue',
-                    widget.event.venue,
-                  ),
+                  _buildDetailRow(Icons.location_on, 'Venue', widget.event.venue),
                   const SizedBox(height: 12),
-                  _buildDetailRow(
-                    Icons.calendar_today,
-                    'Date',
-                    _formatDate(widget.event.date),
-                  ),
+                  _buildDetailRow(Icons.calendar_today, 'Date', _formatDate(widget.event.date)),
                   const SizedBox(height: 12),
-                  _buildDetailRow(
-                    Icons.people,
-                    'Capacity',
-                    '${widget.event.capacity} people',
-                  ),
+                  _buildDetailRow(Icons.people, 'Capacity', '${widget.event.capacity} people'),
                   const SizedBox(height: 24),
 
                   // desc
                   const Text(
                     'Description',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -337,9 +317,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                 icon: const Icon(Icons.edit),
                                 label: const Text('Edit Event'),
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
                                 ),
                               ),
                             ),
@@ -350,9 +328,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                                 icon: const Icon(Icons.delete),
                                 label: const Text('Delete Event'),
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
                                   backgroundColor: Colors.red,
                                   foregroundColor: Colors.white,
                                 ),
@@ -372,10 +348,11 @@ class _EventDetailPageState extends State<EventDetailPage> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
+                              builder: (context) =>
+                                  const LoginPage(),
                             ),
                             (route) => false,
-                          );
+                          );  
                           return;
                         }
 
@@ -394,12 +371,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  // Review preview at the bottom of event detail
-                  ReviewPreviewSection(
-                    matchId: widget.event.matchId,
-                  ),
+                  )  
                 ],
               ),
             ),
@@ -417,12 +389,18 @@ class _EventDetailPageState extends State<EventDetailPage> {
         const SizedBox(width: 8),
         Text(
           '$label: ',
-          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[600],
+          ),
         ),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
