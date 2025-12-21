@@ -59,6 +59,7 @@ class _EventListPageState extends State<EventListPage> {
     final request = Provider.of<CookieRequest>(context, listen: false);
 
     try {
+      // TODO: ganti link ke pws
       final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
 
       if (response["status"] == true) {
@@ -93,7 +94,8 @@ class _EventListPageState extends State<EventListPage> {
     // For physical device: Your server's actual IP address
 
     try {
-      final response = await request.get('http://localhost:8000/events/json/');
+      // TODO: ganti link ke pws
+      final response = await request.get('http://127.0.0.1:8000/events/json/');
 
       // Decode response to json format
       var data = response;
@@ -142,13 +144,17 @@ class _EventListPageState extends State<EventListPage> {
   }
 
   // function to redirect to event detail
-  void _navigateToEventDetail(Events event) {
-    Navigator.push(
+  void _navigateToEventDetail(Events event) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EventDetailPage(event: event),
       ),
     );
+
+    if (result == true) {
+      _loadEvents();
+    }
   }
 
   @override

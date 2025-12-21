@@ -43,6 +43,7 @@ class _EventDetailPageState extends State<EventDetailPage> {
     final request = Provider.of<CookieRequest>(context, listen: false);
 
     try {
+      // TODO: ganti link ke pws
       final response = await request.get("http://127.0.0.1:8000/account/profile-mobile/");
 
       if (response["status"] == true) {
@@ -99,7 +100,8 @@ class _EventDetailPageState extends State<EventDetailPage> {
         final request = Provider.of<CookieRequest>(context, listen: false);
 
         final response = await request.postJson(
-          'http://localhost:8000/events/delete-flutter/${widget.event.matchId}/',
+          // TODO: ganti link ke pws
+          'http://127.0.0.1:8000/events/delete-flutter/${widget.event.matchId}/',
           jsonEncode({}),
 
         );

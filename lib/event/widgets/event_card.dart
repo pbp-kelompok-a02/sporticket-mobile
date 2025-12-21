@@ -38,7 +38,8 @@ class EventCard extends StatelessWidget {
                 ClipRRect(
                   child: event.poster != null && event.poster!.isNotEmpty
                       ? Image.network(
-                    'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(event.poster!)}',
+                    // TODO: ganti link ke pws
+                    'http://127.0.0.1:8000/proxy-image/?url=${Uri.encodeComponent(event.poster!)}',
                     height: 180,
                     width: double.infinity,
                     fit: BoxFit.cover,
